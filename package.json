@@ -1,0 +1,24 @@
+{
+  "name": "tageswoche",
+  "version": "0.0.1-11",
+  "subdomain": "gabrielhase.tageswoche",
+  "author": {
+    "name": "Gabriel Hase",
+    "email": "gabriel@upfront.io"
+  },
+  "scripts": {
+    "start": "node ./bin/server"
+  },
+  "engines": {
+    "node": "0.6.x"
+  },
+  "dependencies": {
+    "express": "2.5.x",
+    "redis": "0.7.x",
+    "hiredis": "0.1.x"
+  },
+  "devDependencies": {
+    "vows": "*",
+    "request": "*"
+  }
+}

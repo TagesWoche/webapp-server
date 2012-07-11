@@ -1,0 +1,3 @@
+// REQUIRE
+var app = require("../config/server"),
+    server = require("../app/controllers/server");
