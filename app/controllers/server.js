@@ -1,7 +1,8 @@
 // VARIABLES
 var app = require("../../config/server"),
     redis = require("redis"),
-    client = redis.createClient(null, null);
+    client = redis.createClient(9111, "redis://barb.redistogo.com/"),
+    client.auth("93fbe3baf4c48b4ec1b3a4f5522937c8");
 
 //-----------------------------------------------------------------------------
 // R O U T E S
