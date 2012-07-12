@@ -17,6 +17,10 @@ app.configure('production', function() {
   app.use(express.logger());
 });
 
+app.configure('development', function() {
+  serverPort = 3000;
+});
+
 app.listen(serverPort);
 
 console.log("started server on port " + serverPort);
