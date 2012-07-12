@@ -1,10 +1,14 @@
 {
   "name": "tageswoche",
-  "version": "0.0.1-11",
-  "subdomain": "gabrielhase.tageswoche",
+  "version": "0.0.1-12",
+  "subdomain": "tageswoche",
   "author": {
     "name": "Gabriel Hase",
     "email": "gabriel@upfront.io"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://https://github.com/peyerluk/Tageswoche.git"
   },
   "scripts": {
     "start": "node ./bin/server"

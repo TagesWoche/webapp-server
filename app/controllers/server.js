@@ -10,3 +10,8 @@ var app = require("../../config/server"),
 app.get('/', function(req, res, next) {
   return res.send("Welcome to tageswoche nodejitsu setup. Up and running.");
 });
+
+app.post('/fcb/situations', function(req, res, next) {
+  console.log("received game situations " + req.body);
+  return res.send("OK", 200);
+});
