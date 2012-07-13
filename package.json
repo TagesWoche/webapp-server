@@ -1,6 +1,6 @@
 {
   "name": "tageswoche",
-  "version": "0.0.1-18",
+  "version": "0.0.1-20",
   "subdomain": "tageswoche",
   "author": {
     "name": "Gabriel Hase",
@@ -19,7 +19,8 @@
   "dependencies": {
     "express": "2.5.x",
     "redis": "0.7.x",
-    "hiredis": "0.1.x"
+    "hiredis": "0.1.x",
+    "underscore": "*"
   },
   "devDependencies": {
     "vows": "*",
