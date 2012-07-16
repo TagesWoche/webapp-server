@@ -64,15 +64,39 @@ app.post('/fcb/situations', function(req, res, next) {
     _.each(replies, function(nickname) {
       console.log("loading player: " + nickname);
       players.push(nickname);
-    })
+    });
+    
+    var errors = [];
+    var gameSituations = [];
+    for ( var i = 0; i < req.body.list.length; i++ ) {
+      var gameSituation = new GameSituation(req.body.list[i]);
+      gameSituation.parse();
+      gameSituation.validate(players);
+      if ( gameSituation.validationErrors.length != 0 ) {
+        errors = _.union(errors, gameSituation.validationErrors);
+      }
+      if ( gameSituation.parseErrors.length != 0) {
+        errors = _.union(errors, gameSituation.parseErrors);
+      }
+      gameSituations.push(gameSituation);
+    }
+
+    if ( errors.length > 0 ) {
+      var errorString = "";
+      for ( var i = 0; i < errors.length; i++ ) {
+        errorString = errorString + "validation error:\n" + errors[i] + "\n";
+      }
+      return res.send(errorString, 500);
+    } else {
+      // redis operations
+      client.del("Situations"); // delete the situations hash
+      for ( var i = 0; i < gameSituations.length; i++ ) {
+        client.hset("Situations", gameSituations[i].line, JSON.stringify(gameSituations[i]));
+      }
+      
+      return res.send("OK", 200);
+    }
   });
   
-  for ( var i = 0; i < req.body.list.length; i++ ) {
-    var gameSituation = new GameSituation(req.body.list[i]);
-    gameSituation.parse();
-    gameSituation.validate(players);
-    console.log(gameSituation);
-  }
   
-  return res.send("OK", 200);
 });

@@ -23,7 +23,7 @@ var GameSituation = function(spreadsheetNotation) {
   this.validationErrors = [];
   this.playerPositions = [];  // TODO: maybe put this into its own object
   this.playerPositionPartsPattern = new RegExp(/(\w{1}.\s*\w+)\s*([A-Z]\d{1,2})\s*(\(.*\))?/);
-  this.positionPattern = new RegExp(/[A-Z]\d{1,2}/);
+  this.positionPattern = new RegExp(/[A-R]\d{1,2}/);
   this.specialConditionsPattern = new RegExp(/\((FD|FI|E|P|PS|EW|F:\s*.*)\)/);
   
   // class variables
@@ -63,7 +63,7 @@ var GameSituation = function(spreadsheetNotation) {
       
       // the name
       if ( playerPositionParts[1] ) {
-        playerPosition.name = playerPositionParts[1];
+        playerPosition.name = playerPositionParts[1].trim();
       } else {
         this.parseErrors.push("The situation on line " + ( this.line ) + " has a part without a player name.");
       }
@@ -102,10 +102,11 @@ var GameSituation = function(spreadsheetNotation) {
   
   // validates the team and opponent fields
   var validateTeamAndOpponent = function() {
-    if ( this.team == this.opponent ) {
-      this.validationErrors.push("The team and the opponent on line " + ( this.line ) + " are equal.");
-    } else if ( this.team.toLowerCase() != 'fcb' && this.opponent.toLowerCase() != 'fcb' ) {
-      this.validationErrors.push("On line " + ( this.line ) + " either the team or the opponent has to be FCB");
+    if ( this.opponent.toLowerCase() == 'fcb' ) {
+      this.validationErrors.push("On line " + ( this.line ) + " the opponent cannot be the FCB itself.");
+    }
+    if ( this.team.toLowerCase() != 'fcb' && this.opponent.toLowerCase() != this.team.toLowerCase() ) {
+      this.validationErrors.push("On line " + ( this.line ) + " the team leading the situation has to be the FCB or the opponent.");
     }
   };
   
@@ -117,19 +118,19 @@ var GameSituation = function(spreadsheetNotation) {
     // TODO: validate Gehalten special case
   };
   
-  var validateName = function(players, name) {
-    if ( _indexOf(players, name) == -1 ) {
-      this.validationErrors.push("The name " + name + " on line " + ( this.line ) + " is not a valid player name. Check the correct nicknames.");
-    }
-  };
-  
   var validatePlayerPositions = function(players) {
-    for ( var i = 0; i < this.playerPositions.length; i++ ) {
-      // the name
-      validateName(players, this.playerPositions[i].name);
-      // TODO: the position
-      
-      // TODO: the special condition
+    if ( this.team.toLowerCase() == "fcb" ) {
+      for ( var i = 0; i < this.playerPositions.length; i++ ) {
+        // the name
+        if ( _.indexOf(players, this.playerPositions[i].name) == -1 ) {
+          this.validationErrors.push("The name " + this.playerPositions[i].name + " on line " + ( this.line ) + " is not a valid player name. Check the correct nicknames.");
+        }
+        // the position
+        if (! this.positionPattern.test(this.playerPositions[i].position )) {
+          this.validationErrors.push("The position " + this.playerPositions[i].position + " on line " + ( this.line ) + " is not well-formed, see the grid for valid values.");
+        }
+        // TODO: the special condition
+      }
     }
   };
   
@@ -170,12 +171,13 @@ var GameSituation = function(spreadsheetNotation) {
   // validates the parsed fields
   //-----------------------------------------------------------------------------
   this.validate = function(players) {
+    
     validateDate.call(this);
     validateMinute.call(this);
     validateTeamAndOpponent.call(this);
     validateScorePosition.call(this);
     
-    validatePlayerPositions.call(this);
+    validatePlayerPositions.call(this, players);
   };
   
   // call the constructor method
