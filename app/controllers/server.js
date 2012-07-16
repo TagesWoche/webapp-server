@@ -16,6 +16,17 @@ app.get('/', function(req, res, next) {
   return res.send("Welcome to tageswoche nodejitsu setup. Up and running." + situation);
 });
 
+app.post('/fcb/players', function(req, res, next) {
+  console.log("received players:");
+  console.log(req.body);
+  
+  for ( var i = 0; i < req.body.list.length; i++ ) {
+    var player = new Player("FCB", req.body.list[i]);
+    player.parse();
+    console.log(player);
+  }
+});
+
 app.post('/fcb/situations', function(req, res, next) {
   console.log("received game situations:");
   console.log(req.body);
