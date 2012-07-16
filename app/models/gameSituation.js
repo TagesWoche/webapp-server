@@ -23,6 +23,7 @@ var GameSituation = function(spreadsheetNotation) {
   this.validationErrors = [];
   this.playerPositions = [];  // TODO: maybe put this into its own object
   this.playerPositionPartsPattern = new RegExp(/(\w{1}.\s*\w+)\s*([A-Z]\d{1,2})\s*(\(.*\))?/);
+  this.positionPattern = new RegExp(/[A-Z]\d{1,2}/);
   this.specialConditionsPattern = new RegExp(/\((FD|FI|E|P|PS|EW|F:\s*.*)\)/);
   
   // class variables
@@ -150,8 +151,10 @@ var GameSituation = function(spreadsheetNotation) {
     // boolean flags
     if ( this.spreadsheetNotation.scoredByHead === 'x' )
       this.scoredByHead = true;
-    if ( this.spreadsheetNotation.scoredByFoot === 'x' )
-      this.scoredByFoot = true;
+    if ( this.spreadsheetNotation.scoredByRightFoot === 'x' )
+      this.scoredByRightFoot = true;
+    if ( this.spreadsheetNotation.scoredByLeftFoot === 'x' )
+      this.scoredByLeftFoot = true;
     if ( this.spreadsheetNotation.scoredByWhatever === 'x' )
       this.scoredByWhatever = true;
     if ( this.spreadsheetNotation.ownGoal === 'x' )
@@ -167,12 +170,12 @@ var GameSituation = function(spreadsheetNotation) {
   // validates the parsed fields
   //-----------------------------------------------------------------------------
   this.validate = function(players) {
-    validateDate();
-    validateMinute();
-    validateTeamAndOpponent();
-    validateScorePosition();
+    validateDate.call(this);
+    validateMinute.call(this);
+    validateTeamAndOpponent.call(this);
+    validateScorePosition.call(this);
     
-    validatePlayerPositions();
+    validatePlayerPositions.call(this);
   };
   
   // call the constructor method
