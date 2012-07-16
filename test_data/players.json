@@ -1,0 +1,9 @@
+{ "list":
+  [ { "number": 1,
+      "nickname": "Sommer",
+      "name": "Yann Sommer",
+      "position": "TW",
+      "birthday": "1988-12-17T23:00:00.000Z",
+      "nationality": "Schweiz",
+      "line": 1} ] 
+}

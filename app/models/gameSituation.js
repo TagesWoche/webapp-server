@@ -116,6 +116,21 @@ var GameSituation = function(spreadsheetNotation) {
     // TODO: validate Gehalten special case
   };
   
+  var validateName = function(players, name) {
+    if ( _indexOf(players, name) == -1 ) {
+      this.validationErrors.push("The name " + name + " on line " + ( this.line ) + " is not a valid player name. Check the correct nicknames.");
+    }
+  };
+  
+  var validatePlayerPositions = function(players) {
+    for ( var i = 0; i < this.playerPositions.length; i++ ) {
+      // the name
+      validateName(players, this.playerPositions[i].name);
+      // TODO: the position
+      
+      // TODO: the special condition
+    }
+  };
   
   // instance methods
   //-----------------------------------------------------------------------------
@@ -123,27 +138,27 @@ var GameSituation = function(spreadsheetNotation) {
   //-----------------------------------------------------------------------------
   this.parse = function() {
     // easy fields
-    this.date = spreadsheetNotation.date;
-    this.opponent = spreadsheetNotation.opponent;
-    this.team = spreadsheetNotation.team;
-    this.scorePosition = spreadsheetNotation.scorePosition;
-    this.minute = spreadsheetNotation.minute;
+    this.date = new Date( Date.parse(this.spreadsheetNotation.date) );
+    this.opponent = this.spreadsheetNotation.opponent;
+    this.team = this.spreadsheetNotation.team;
+    this.scorePosition = this.spreadsheetNotation.scorePosition;
+    this.minute = this.spreadsheetNotation.minute;
     
     // helper field
-    this.line = spreadsheetNotation.line + 1;
+    this.line = this.spreadsheetNotation.line + 1;
     
     // boolean flags
-    if ( spreadsheetNotation.scoredByHead === 'x' )
+    if ( this.spreadsheetNotation.scoredByHead === 'x' )
       this.scoredByHead = true;
-    if ( spreadsheetNotation.scoredByFoot === 'x' )
+    if ( this.spreadsheetNotation.scoredByFoot === 'x' )
       this.scoredByFoot = true;
-    if ( spreadsheetNotation.scoredByWhatever === 'x' )
+    if ( this.spreadsheetNotation.scoredByWhatever === 'x' )
       this.scoredByWhatever = true;
-    if ( spreadsheetNotation.ownGoal === 'x' )
+    if ( this.spreadsheetNotation.ownGoal === 'x' )
       this.ownGoal = true;
       
     // situation Notation
-    var playerPositions = spreadsheetNotation.gameSituation.split("->");
+    var playerPositions = this.spreadsheetNotation.gameSituation.split("->");
     console.log(playerPositions);
     parsePlayerPositions.call(this, playerPositions);
   };
@@ -151,15 +166,13 @@ var GameSituation = function(spreadsheetNotation) {
   //-----------------------------------------------------------------------------
   // validates the parsed fields
   //-----------------------------------------------------------------------------
-  this.validate = function() {
+  this.validate = function(players) {
     validateDate();
     validateMinute();
     validateTeamAndOpponent();
     validateScorePosition();
     
-    // TODO: validate name against kader
-    // TODO: validate player positions
-    // TODO: valdidate special condition
+    validatePlayerPositions();
   };
   
   // call the constructor method
