@@ -29,11 +29,7 @@ var GameSituation = function(spreadsheetNotation) {
   // class variables
   var maxTime = 125; // 120 min + 5 min overtime
   var allowedScorePositions = ["OR", "OM", "OL", "UR", "UM", "UL", "LD", "RD", "OD", "G:"];
-  
-  var init = function(spreadsheetNotation) {
-    // NOTE: init code goes here
-  };
-  
+
   //-----------------------------------------------------------------------------
   // private function to parse a special condition, e.g. a foul or a penalty
   //-----------------------------------------------------------------------------
@@ -179,9 +175,6 @@ var GameSituation = function(spreadsheetNotation) {
     
     validatePlayerPositions.call(this, players);
   };
-  
-  // call the constructor method
-  init.apply(this, spreadsheetNotation);
 };
 
 module.exports = GameSituation;
