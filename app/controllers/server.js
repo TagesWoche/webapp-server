@@ -46,7 +46,7 @@ app.post('/fcb/players', function(req, res, next) {
     // redis operations
     client.del("FCB"); // delete the players hash
     for ( var i = 0; i < players.length; i++ ) {
-      client.hset("FCB", player.nickname, JSON.stringify(player));
+      client.hset("FCB", players[i].nickname, JSON.stringify(players[i]));
     }
   
     return res.send("OK", 200);
