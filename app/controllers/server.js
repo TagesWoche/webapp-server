@@ -17,6 +17,13 @@ app.get('/', function(req, res, next) {
   return res.send("Welcome to tageswoche nodejitsu setup. Up and running.");
 });
 
+
+app.post('/fcb/games', function(req, res, next) {
+  console.log("received games:");
+  console.log(req.body);
+  
+});
+
 // updates the FCB Kader
 app.post('/fcb/players', function(req, res, next) {
   console.log("received players:");
