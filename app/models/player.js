@@ -4,9 +4,11 @@
     \author   Gabriel Hase (gabriel.hase(at)upfront(dot)io)
 
             purpose:    Defines a player.
-                        - parse
-                        - validate
-                        
+                        - parse all fields
+                        - validate:
+                          - position
+                          - birthday
+                          - number                        
 */                  
 //-----------------------------------------------------------------------------
 
@@ -25,7 +27,9 @@ var Player = function(team, spreadsheetNotation) {
   // class variables
   var allowedPositions = ["TW", "VE", "MF", "ST"];
   
-  // private functions (class level)
+  // ==========================
+  // validation methods
+  // ==========================
   var validateNumber = function() {
     if ( isNaN(this.number - 0) ) {
       this.validationErrors.push("The player number on line " + ( this.line ) + " is not a number.");
@@ -48,10 +52,10 @@ var Player = function(team, spreadsheetNotation) {
       this.validationErrors.push("The birthday on line " + ( this.line ) + " is not a date. Write as dd.mm.yyyy, e.g. 02.01.2012");  
   };
   
+  // ==========================
   // instance methods
-  //-----------------------------------------------------------------------------
+  // ==========================
   // parses the spreadsheet notation into object notation
-  //-----------------------------------------------------------------------------
   this.parse = function() {
     this.number = this.spreadsheetNotation.number;
     this.nickname = this.spreadsheetNotation.nickname;
@@ -69,15 +73,13 @@ var Player = function(team, spreadsheetNotation) {
     this.line = this.spreadsheetNotation.line;
   };
   
-  //-----------------------------------------------------------------------------
   // validates fields
-  //-----------------------------------------------------------------------------
   this.validate = function() {
     validateNumber.call(this);
     validatePosition.call(this);
-    validateBirthday.call(this);
-    
+    validateBirthday.call(this);  
   };
 };
 
+// export
 module.exports = Player;

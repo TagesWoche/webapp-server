@@ -4,8 +4,13 @@
     \author   Gabriel Hase (gabriel.hase(at)upfront(dot)io)
 
             purpose:    Defines a game situation.
-                        - parse
-                        - validate
+                        - parse all fields
+                        - validate:
+                          - date
+                          - minute
+                          - team and opponent
+                          - score Position
+                          - situation notation
                         
 */                  
 //-----------------------------------------------------------------------------
@@ -30,9 +35,10 @@ var GameSituation = function(spreadsheetNotation) {
   var maxTime = 125; // 120 min + 5 min overtime
   var allowedScorePositions = ["OR", "OM", "OL", "UR", "UM", "UL", "LD", "RD", "OD", "G:"];
 
-  //-----------------------------------------------------------------------------
-  // private function to parse a special condition, e.g. a foul or a penalty
-  //-----------------------------------------------------------------------------
+  // ==========================
+  // parsing helper methods
+  // ==========================
+  // parse the special condition
   var parseSpecialCondition = function(specialCondition, playerPosition) {
     var specialConditionPattern = new RegExp(/\((.*)\)/);
     var specialConditionMatches = specialConditionPattern.exec(specialCondition);
@@ -48,9 +54,7 @@ var GameSituation = function(spreadsheetNotation) {
     }
   };
   
-  //-----------------------------------------------------------------------------
-  // private function to parse the player positions
-  //-----------------------------------------------------------------------------
+  // parse the player name position and special condition
   var parsePlayerPositions = function(playerPositions) {
     for ( var i = 0; i < playerPositions.length; i++ ) {
       // split into name, position and special condition, e.g. penalty or foul
@@ -80,6 +84,9 @@ var GameSituation = function(spreadsheetNotation) {
     }
   };
   
+  // ==========================
+  // validation methods
+  // ==========================
   // validates a date
   var validateDate = function() {
     if ( Object.prototype.toString.call(this.date) !== '[object Date]' )
@@ -130,10 +137,11 @@ var GameSituation = function(spreadsheetNotation) {
     }
   };
   
+  
+  // ==========================
   // instance methods
-  //-----------------------------------------------------------------------------
+  // ==========================
   // parses the spreadsheet notation into object notation
-  //-----------------------------------------------------------------------------
   this.parse = function() {
     // easy fields
     this.date = new Date( Date.parse(this.spreadsheetNotation.date) );
@@ -163,9 +171,7 @@ var GameSituation = function(spreadsheetNotation) {
     parsePlayerPositions.call(this, playerPositions);
   };
   
-  //-----------------------------------------------------------------------------
   // validates the parsed fields
-  //-----------------------------------------------------------------------------
   this.validate = function(players) {
     
     validateDate.call(this);
@@ -177,66 +183,5 @@ var GameSituation = function(spreadsheetNotation) {
   };
 };
 
+// export
 module.exports = GameSituation;
-
-/*
-  
-
-var parseGameSituation = function(line, situation, team) {
-  var situationPartsPattern = new RegExp(/(\w{1}.\s*\w+)\s*([A-Z]\d{1,2})\s*(\(.*\))?/);
-  //var namePattern = new RegExp(/[A-Z]{1}\.\s*\w+/);
-  var positionPattern = new RegExp(/[A-Z]\d{1,2}/);
-  var specialConditionPattern = new RegExp(/\([FD,FI,E,P,PS,EW]\)|\((F:\s*\w+)\)/);
-  var situationObject = {};
-  situationObject['list'] = [];
-  
-  var positions = situation.split('->');
-  if ( positions.length == 0 ) {
-    Browser.msgBox("The situation on line " + ( line + 1) + " has no content.");
-    return false;
-  }
-    
-  for (var i = 0; i < positions.length; i++) {
-    var situationPartObject = {};
-    
-    var situationParts = situationPartsPattern.exec(positions[i]);
-    
-    // the name
-    if ( situationParts[1] ) {
-      // only validate names of the FCB
-      if ( team == "FCB" ) {
-        var nameParts = situationsParts[1].split(" ");
-        // TODO: check that player is in kader
-      }
-    } else {
-      Browser.msgBox("The situation on line " + ( line + 1) + " has a part without a player name.");
-      return false;
-    }
-    // the position
-    if ( situationParts[2] ) {
-      if ( positionPattern.test(situationParts[2]) ) {
-        situationPartObject['position'] = situationParts[2];
-      } else {
-        Browser.msgBox("The position in the situation on line " + ( line + 1) + " is not well-formed. Write e.g. as C6.");
-        return false;
-      }
-    } else {
-      Browser.msgBox("The situation on line " + ( line + 1) + " has a part without a player position.");
-      return false;
-    }
-    
-    // TODO: the special condition: optional
-    if ( situationsParts[3] ) {
-      
-    }
-    
-    // add to object
-    situationObject.list.push(situationPartObject);
-
-    //Logger.log(situationParts);
-  }
-  
-  return situationObject;
-};
-
-*/

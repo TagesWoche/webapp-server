@@ -11,6 +11,16 @@ var app = require("../../config/server"),
 client.auth("93fbe3baf4c48b4ec1b3a4f5522937c8");
 
 //-----------------------------------------------------------------------------
+// M I D D L E W A R E
+//-----------------------------------------------------------------------------
+// logs the body of an incoming request
+var logIncoming = function(req, res, next) {
+  console.log("got incoming traffic on: " + req.url);
+  console.log(req.body);
+  next();
+};
+
+//-----------------------------------------------------------------------------
 // R O U T E S
 //-----------------------------------------------------------------------------
 
@@ -18,12 +28,8 @@ app.get('/', function(req, res, next) {
   return res.send("Welcome to tageswoche nodejitsu setup. Up and running.");
 });
 
-
-app.post('/fcb/games', function(req, res, next) {
-  // log incoming
-  console.log("received games:");
-  console.log(req.body);
-  
+// updates the games
+app.post('/fcb/games', logIncoming, function(req, res, next) {
   // load the players (only nicknames)
   var players = [];
   client.hkeys("FCB", function (err, replies) {
@@ -31,7 +37,7 @@ app.post('/fcb/games', function(req, res, next) {
       console.log("loading player: " + nickname);
       players.push(nickname);
     });
-    
+    // group by date
     var groupedList = _.groupBy(req.body.list, function(entry) {
       return entry.date;
     });
@@ -43,7 +49,6 @@ app.post('/fcb/games', function(req, res, next) {
       game.parse();
       game.validate(players);
       errors = _.union(errors, game.validationErrors);
-      //console.log(game);
       games.push(game);
     }
     
@@ -66,21 +71,16 @@ app.post('/fcb/games', function(req, res, next) {
 });
 
 // updates the FCB Kader
-app.post('/fcb/players', function(req, res, next) {
-  console.log("received players:");
-  console.log(req.body);
-  
+app.post('/fcb/players', logIncoming, function(req, res, next) {
+
   var players = [];
   var errors = [];
   for ( var i = 0; i < req.body.list.length; i++ ) {
     var player = new Player("FCB", req.body.list[i]);
     player.parse();
     player.validate();
-    if ( player.validationErrors.length === 0 ) {
-      players.push(player);
-    } else {
-      errors = _.union(errors, player.validationErrors);
-    }
+    errors = _.union(errors, player.validationErrors);
+    players.push(player);
   }
   
   if ( errors.length > 0 ) {
@@ -101,10 +101,7 @@ app.post('/fcb/players', function(req, res, next) {
   }
 });
 
-app.post('/fcb/situations', function(req, res, next) {
-  // log first
-  console.log("received game situations:");
-  console.log(req.body);
+app.post('/fcb/situations', logIncoming, function(req, res, next) {
   
   // load the players (only nicknames)
   var players = [];
@@ -120,12 +117,8 @@ app.post('/fcb/situations', function(req, res, next) {
       var gameSituation = new GameSituation(req.body.list[i]);
       gameSituation.parse();
       gameSituation.validate(players);
-      if ( gameSituation.validationErrors.length !== 0 ) {
-        errors = _.union(errors, gameSituation.validationErrors);
-      }
-      if ( gameSituation.parseErrors.length !== 0) {
-        errors = _.union(errors, gameSituation.parseErrors);
-      }
+      errors = _.union(errors, gameSituation.validationErrors);
+      errors = _.union(errors, gameSituation.parseErrors);
       gameSituations.push(gameSituation);
     }
 
