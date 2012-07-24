@@ -25,7 +25,7 @@ var Game = function(spreadsheetNotation) {
   this.validationErrors = [];
   
   // class variables
-  var allowedCompetitions = ["m", "c", "cl", "el"];
+  var allowedCompetitions = ["m", "c", "cl", "qcl", "el", "qel"];
     
   // ==========================  
   // validation methods
