@@ -1,14 +1,13 @@
 #Tageswoche
 
+node.js server für Tageswoche Applikationen
+
 ##Fussball
 
-- Spreadsheet
 - Google Docs API
-- Visualisierungen
+- API für Visualisierungen
 
 ##Politik
 
-- CMS-Integration
-- OpenStreetMap Karte
-- Datenimport und Aufbereitung
-- Visualisierungen
+- Sourcefabric CMS Schnittstelle?
+- Datenimport und Aufbereitung?
