@@ -1,22 +1,17 @@
 // VARIABLES
 var app = require("../../config/server"),
     _ = require('underscore')._,
-    redis = require("redis"),
-    client = redis.createClient(9111, "barb.redistogo.com"),
     GameSituation = require("../models/gameSituation.js"),
     Player = require("../models/player.js"),
     Game = require("../models/game.js");
-
-// authenticate redis db
-client.auth("93fbe3baf4c48b4ec1b3a4f5522937c8");
 
 //-----------------------------------------------------------------------------
 // M I D D L E W A R E
 //-----------------------------------------------------------------------------
 // logs the body of an incoming request
 var logIncoming = function(req, res, next) {
-  console.log("got incoming traffic on: " + req.url);
-  console.log(req.body);
+  //console.log("got incoming traffic on: " + req.url);
+  //console.log(req.body);
   next();
 };
 
@@ -32,11 +27,12 @@ app.get('/', function(req, res, next) {
 app.post('/fcb/games', logIncoming, function(req, res, next) {
   // load the players (only nicknames)
   var players = [];
-  client.hkeys("FCB", function (err, replies) {
+  app.redisClient.hkeys("FCB", function (err, replies) {
     _.each(replies, function(nickname) {
-      console.log("loading player: " + nickname);
+      //console.log("loading player: " + nickname);
       players.push(nickname);
     });
+
     // group by date
     var groupedList = _.groupBy(req.body.list, function(entry) {
       return entry.date;
@@ -57,12 +53,13 @@ app.post('/fcb/games', logIncoming, function(req, res, next) {
       for ( i = 0; i < errors.length; i++ ) {
         errorString = errorString + "validation error:\n" + errors[i] + "\n";
       }
+      console.log(errorString);
       return res.send(errorString, 500);
     } else {
       // redis operations
-      client.del("Games"); // delete the players hash
+      app.redisClient.del("Games"); // delete the players hash
       for ( i = 0; i < games.length; i++ ) {
-        client.hset("Games", games[i].date.toString(), JSON.stringify(games[i]));
+        app.redisClient.hset("Games", games[i].date.toString(), JSON.stringify(games[i]));
       }
       return res.send("OK", 200);
     }
@@ -89,12 +86,13 @@ app.post('/fcb/players', logIncoming, function(req, res, next) {
       errorString = errorString + "validation error:\n" + errors[i] + "\n";
     }
     
+    console.log(errorString);
     return res.send(errorString, 500);
   } else {
     // redis operations
-    client.del("FCB"); // delete the players hash
+    app.redisClient.del("FCB"); // delete the players hash
     for ( i = 0; i < players.length; i++ ) {
-      client.hset("FCB", players[i].nickname, JSON.stringify(players[i]));
+      app.redisClient.hset("FCB", players[i].nickname, JSON.stringify(players[i]));
     }
   
     return res.send("OK", 200);
@@ -105,9 +103,9 @@ app.post('/fcb/situations', logIncoming, function(req, res, next) {
   
   // load the players (only nicknames)
   var players = [];
-  client.hkeys("FCB", function (err, replies) {
+  app.redisClient.hkeys("FCB", function (err, replies) {
     _.each(replies, function(nickname) {
-      console.log("loading player: " + nickname);
+      //console.log("loading player: " + nickname);
       players.push(nickname);
     });
     
@@ -130,9 +128,9 @@ app.post('/fcb/situations', logIncoming, function(req, res, next) {
       return res.send(errorString, 500);
     } else {
       // redis operations
-      client.del("Situations"); // delete the situations hash
+      app.redisClient.del("Situations"); // delete the situations hash
       for ( i = 0; i < gameSituations.length; i++ ) {
-        client.hset("Situations", gameSituations[i].line, JSON.stringify(gameSituations[i]));
+        app.redisClient.hset("Situations", gameSituations[i].line, JSON.stringify(gameSituations[i]));
       }
       
       return res.send("OK", 200);

@@ -57,20 +57,34 @@ var GameSituation = function(spreadsheetNotation) {
   // parse the player name position and special condition
   var parsePlayerPositions = function(playerPositions) {
     for ( var i = 0; i < playerPositions.length; i++ ) {
+      var lastPlayerName,
+          lastPlayerPosition,
+          walkingMan = false,
+          playerPosition = {}; 
+          
       // split into name, position and special condition, e.g. penalty or foul
       var playerPositionParts = this.playerPositionPartsPattern.exec(playerPositions[i]);
-      var playerPosition = {};
+      var playerName = playerPositionParts[1].trim();
+      
+      if ( lastPlayerName === playerName ) {
+        playerPosition = lastPlayerPosition;
+        walkingMan = true;
+      }
       
       // the name
       if ( playerPositionParts[1] ) {
-        playerPosition.name = playerPositionParts[1].trim();
+        playerPosition.name = playerName;
+        lastPlayerName = playerPosition.name;
       } else {
         this.parseErrors.push("The situation on line " + ( this.line ) + " has a part without a player name.");
       }
       
       // the position
       if ( playerPositionParts[2] ) {
-        playerPosition.position = playerPositionParts[2];
+        if ( !playerPosition.positions ){
+          playerPosition.positions = [];
+        }
+        playerPosition.positions.push(playerPositionParts[2]);
       } else {
         this.parseErrors.push("The situation on line " + ( this.line ) + " has a part without a player position.");
       }
@@ -80,7 +94,9 @@ var GameSituation = function(spreadsheetNotation) {
         parseSpecialCondition(playerPositionParts[3], playerPosition);
       }
       
-      this.playerPositions.push(playerPosition);
+      lastPlayerPosition = playerPosition;
+      if ( walkingMan == false )
+        this.playerPositions.push(playerPosition);
     }
   };
   
@@ -129,8 +145,11 @@ var GameSituation = function(spreadsheetNotation) {
           this.validationErrors.push("The name " + this.playerPositions[i].name + " on line " + ( this.line ) + " is not a valid player name. Check the correct nicknames.");
         }
         // the position
-        if (! this.positionPattern.test(this.playerPositions[i].position )) {
-          this.validationErrors.push("The position " + this.playerPositions[i].position + " on line " + ( this.line ) + " is not well-formed, see the grid for valid values.");
+        for ( var n = 0; n < this.playerPositions[i].positions.length; n++ ) {
+          var position = this.playerPositions[i].positions[n];
+          if (! this.positionPattern.test( position )) {
+            this.validationErrors.push("The position " + position + " on line " + ( this.line ) + " is not well-formed, see the grid for valid values.");
+          }
         }
         // TODO: the special condition
       }
@@ -167,7 +186,7 @@ var GameSituation = function(spreadsheetNotation) {
       
     // situation Notation
     var playerPositions = this.spreadsheetNotation.gameSituation.split("->");
-    console.log(playerPositions);
+    //console.log(playerPositions);
     parsePlayerPositions.call(this, playerPositions);
   };
   

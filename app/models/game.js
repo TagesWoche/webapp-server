@@ -53,8 +53,8 @@ var Game = function(spreadsheetNotation) {
   };  
   
   var validateCompleteTeam = function(players) {
-    console.log(this.spreadsheetNotation.length);
-    console.log(players.length);
+    //console.log(this.spreadsheetNotation.length);
+    //console.log(players.length);
     if ( this.spreadsheetNotation.length !== players.length ) {
       this.validationErrors.push("For the game of the " + this.date + " the team is not complete. There are " + this.spreadsheetNotation.length + " players in the notation, but there should be " + players.length);
     }

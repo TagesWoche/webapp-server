@@ -47,7 +47,7 @@ var Player = function(team, spreadsheetNotation) {
   
   // validates a date
   var validateBirthday = function() {
-    console.log(Object.prototype.toString.call(this.birthday));
+    //console.log(Object.prototype.toString.call(this.birthday));
     if ( Object.prototype.toString.call(this.birthday) !== '[object Date]' )
       this.validationErrors.push("The birthday on line " + ( this.line ) + " is not a date. Write as dd.mm.yyyy, e.g. 02.01.2012");  
   };

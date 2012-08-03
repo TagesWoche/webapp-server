@@ -2,6 +2,7 @@
 var application_root = __dirname + "/..",
     express = require("express")
     path = require("path"),
+    redis = require("redis"),
     serverPort = 8080;
     
 // EXPRESS
@@ -14,11 +15,20 @@ app.configure(function () {
 
 // PROD
 app.configure('production', function() {
+  app.redisClient = redis.createClient(9111, "barb.redistogo.com");
+  // authenticate redis db
+  app.redisClient.auth("93fbe3baf4c48b4ec1b3a4f5522937c8");
   app.use(express.logger());
 });
 
 app.configure('development', function() {
+  app.redisClient = redis.createClient();
   serverPort = 3000;
+});
+
+app.configure("test", function() {
+  app.redisClient = redis.createClient();
+  serverPort = 3010;
 });
 
 app.listen(serverPort);
