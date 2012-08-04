@@ -19,11 +19,15 @@ app.configure('production', function() {
   // authenticate redis db
   app.redisClient.auth("93fbe3baf4c48b4ec1b3a4f5522937c8");
   app.use(express.logger());
+  
+  app.enable("jsonp callback");
 });
 
 app.configure('development', function() {
   app.redisClient = redis.createClient();
   serverPort = 3000;
+  
+  app.enable("jsonp callback");
 });
 
 app.configure("test", function() {
