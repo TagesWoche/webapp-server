@@ -65,7 +65,7 @@ var GameSituation = function(spreadsheetNotation) {
           
       // split into name, position and special condition, e.g. penalty or foul
       var playerPositionParts = this.playerPositionPartsPattern.exec(playerPositions[i]);
-      if ( !playerPositionsParts[1] ) {
+      if ( !playerPositionParts[1] ) {
         this.parseErrors.push("The situation on line " + ( this.line ) + " has a part without a player name.");
         continue;
       }
