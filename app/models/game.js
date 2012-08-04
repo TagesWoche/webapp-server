@@ -151,7 +151,7 @@ Game.parseValidateAndSaveSpreadsheet = function(dbHandler, spreadsheetList, call
         errorString = errorString + "validation error:\n" + errors[i] + "\n";
       }
 
-      return callback(errorString, 500);
+      return callback(errorString, 400);
     } else {
       // redis operations
       dbHandler.del("Games"); // delete the players hash
