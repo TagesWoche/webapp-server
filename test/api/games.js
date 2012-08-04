@@ -103,7 +103,6 @@ vows.describe("fcb api").addBatch( {
           },
           "should get the games from redis": function(err, replies) {
             assert.isNull(err);
-          
             //console.log(_.keys(replies).length);
             assert.equal(1, _.keys(replies).length);
             
@@ -122,13 +121,12 @@ vows.describe("fcb api").addBatch( {
             topic: api.get("/fcb/situations"),
             "should return with the situation data": function(err, req, body) {
               assert.isNull(err);
-              for ( key in req.body ) {
-                var situation = JSON.parse(req.body[key]);
+              for ( var i = 0; i < req.body.list.length; i++ ) {
+                var situation = req.body.list[i];
                 assert.equal("1-0", situation.score);
                 assert.equal("Servette", situation.opponent);
                 assert.equal(false, situation.homematch);
                 assert.equal("m", situation.competition);
-                //console.log(situation);
               }
             }
           }
