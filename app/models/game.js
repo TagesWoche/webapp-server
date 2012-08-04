@@ -51,7 +51,8 @@ var Game = function(spreadsheetNotation) {
       this.validationErrors.push("For the game of " + this.date.toString()  + " there is an illegal value for competition. Legal values are: " + allowedCompetitions.toString());
     }
   };  
-  
+ 
+ /* 
   var validateCompleteTeam = function(players) {
     //console.log(this.spreadsheetNotation.length);
     //console.log(players.length);
@@ -59,6 +60,7 @@ var Game = function(spreadsheetNotation) {
       this.validationErrors.push("For the game of the " + this.date + " the team is not complete. There are " + this.spreadsheetNotation.length + " players in the notation, but there should be " + players.length);
     }
   };
+  */ 
     
   // ==========================
   // instance methods
@@ -118,6 +120,49 @@ var Game = function(spreadsheetNotation) {
     validateCompetition.call(this);
   };
 };
+
+Game.parseValidateAndSaveSpreadsheet = function(dbHandler, spreadsheetList, callback) {
+  // load the players (only nicknames)
+  var players = [];
+  dbHandler.hkeys("FCB", function (err, replies) {
+    _.each(replies, function(nickname) {
+      //console.log("loading player: " + nickname);
+      players.push(nickname);
+    });
+
+    // group by date
+    var groupedList = _.groupBy(spreadsheetList, function(entry) {
+      return entry.date;
+    });
+  
+    var games = [];
+    var errors = [];
+    for ( var date in groupedList ) {
+      var game = new Game(groupedList[date]);
+      game.parse();
+      game.validate(players);
+      errors = _.union(errors, game.validationErrors);
+      games.push(game);
+    }
+    
+    if ( errors.length !== 0 ) {
+      var errorString = "";
+      for ( i = 0; i < errors.length; i++ ) {
+        errorString = errorString + "validation error:\n" + errors[i] + "\n";
+      }
+
+      return callback(errorString, 500);
+    } else {
+      // redis operations
+      dbHandler.del("Games"); // delete the players hash
+      for ( i = 0; i < games.length; i++ ) {
+        dbHandler.hset("Games", games[i].date.toString(), JSON.stringify(games[i]));
+      }
+      return callback("OK", 200);
+    }
+  });
+};
+
 
 // export
 module.exports = Game;

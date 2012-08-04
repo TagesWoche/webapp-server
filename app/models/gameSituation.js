@@ -35,6 +35,7 @@ var GameSituation = function(spreadsheetNotation) {
   var maxTime = 125; // 120 min + 5 min overtime
   var allowedScorePositions = ["OR", "OM", "OL", "UR", "UM", "UL", "LD", "RD", "OD", "G:"];
 
+  
   // ==========================
   // parsing helper methods
   // ==========================
@@ -95,7 +96,7 @@ var GameSituation = function(spreadsheetNotation) {
       }
       
       lastPlayerPosition = playerPosition;
-      if ( walkingMan == false )
+      if ( walkingMan === false )
         this.playerPositions.push(playerPosition);
     }
   };
@@ -200,7 +201,70 @@ var GameSituation = function(spreadsheetNotation) {
     
     validatePlayerPositions.call(this, players);
   };
+  
+  this.addGameData = function(games) {
+    var gameExists = false;
+    for (var key in games) {
+      if ( new Date(key).toUTCString() == this.date.toUTCString() ) {
+        gameExists = true;
+        var game = JSON.parse(games[key]);
+        this.score = game.finalScore;
+        this.competition = game.competition;
+        this.homematch = game.homematch;
+      }
+    }
+    return gameExists;
+  };
 };
+
+// ==========================
+// class methods
+// ==========================
+GameSituation.parseValidateAndSaveSpreadsheet = function(dbHandler, spreadsheetList, callback) {
+  // load the players (only nicknames)
+  var players = [];
+  dbHandler.hkeys("FCB", function (err, replies) {
+    _.each(replies, function(nickname) {
+      //console.log("loading player: " + nickname);
+      players.push(nickname);
+    });
+    
+    dbHandler.hgetall("Games", function (err, games) {      
+      var errors = [];
+      var gameSituations = [];
+      for ( var i = 0; i < spreadsheetList.length; i++ ) {
+        var gameSituation = new GameSituation(spreadsheetList[i]);
+        gameSituation.parse();
+        gameSituation.validate(players);
+        var gameExists = gameSituation.addGameData(games);
+        if ( gameExists === true ) {  // only save situations for games that are there
+          errors = _.union(errors, gameSituation.validationErrors);
+          errors = _.union(errors, gameSituation.parseErrors);
+          gameSituations.push(gameSituation);
+        }
+      }
+
+      if ( errors.length > 0 ) {
+        var errorString = "";
+        for ( i = 0; i < errors.length; i++ ) {
+          errorString = errorString + "validation error:\n" + errors[i] + "\n";
+        }
+      
+        return callback(errorString, 500);
+      } else {
+        // redis operations
+        dbHandler.del("Situations"); // delete the situations hash
+        for ( i = 0; i < gameSituations.length; i++ ) {
+          dbHandler.hset("Situations", gameSituations[i].line, JSON.stringify(gameSituations[i]));
+        }
+
+        return callback("OK", 200);
+      }
+    });  
+  });
+};
+
+
 
 // export
 module.exports = GameSituation;

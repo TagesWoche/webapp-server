@@ -28,6 +28,12 @@ vows.describe("fcb api").addBatch( {
         assert.equal(27, replies.length);
       }
     }
+  },
+  
+  teardown: function() {
+    redisClient.del("FCB");
+    redisClient.del("Games");
+    redisClient.del("Situations");
   }
   
 }).addBatch( { 
@@ -59,6 +65,12 @@ vows.describe("fcb api").addBatch( {
         }
       }
     }  
+  },
+  
+  teardown: function() {
+    redisClient.del("FCB");
+    redisClient.del("Games");
+    redisClient.del("Situations");
   }
     
 }).addBatch( {
@@ -70,39 +82,65 @@ vows.describe("fcb api").addBatch( {
     
     "should return status code 200": api.assertStatus(200),
     
-    "-> post the scenes description": {
+    "-> post a game description": {
       topic: function() {
-        api.postData("/fcb/situations", "gameSituations", this.callback)();
+        api.postData("/fcb/games", "games", this.callback)();
       },
       "should return status code 200": api.assertStatus(200),
-      
-      "--> get the game description from redis": {
+    
+      "--> post the scenes description": {
         topic: function() {
-          var cb = this.callback;
-          redisClient.hgetall("Situations", function(err, replies) {
-            cb(err, replies);
-          });
+          api.postData("/fcb/situations", "gameSituations", this.callback)();
         },
-        "should get the games from redis": function(err, replies) {
-          assert.isNull(err);
+        "should return status code 200": api.assertStatus(200),
+      
+        "---> get the scene description from redis": {
+          topic: function() {
+            var cb = this.callback;
+            redisClient.hgetall("Situations", function(err, replies) {
+              cb(err, replies);
+            });
+          },
+          "should get the games from redis": function(err, replies) {
+            assert.isNull(err);
           
-          var key, value;
-          for (key in replies) {
-            var gameSituation = JSON.parse(replies[key]);
-            // situation 3 has a walking man
-            if ( key == 3 ) {
-              assert.equal(4, gameSituation.playerPositions.length);
-              assert.equal(2, gameSituation.playerPositions[1].positions.length);
+            //console.log(_.keys(replies).length);
+            assert.equal(1, _.keys(replies).length);
+            
+            var key, value;
+            for (key in replies) {
+              var gameSituation = JSON.parse(replies[key]);
+              // situation 3 has a walking man
+              if ( key == 3 ) {
+                assert.equal(4, gameSituation.playerPositions.length);
+                assert.equal(2, gameSituation.playerPositions[1].positions.length);
+              }
             }
-            //console.log(_.keys(gameSituation));
-            //console.log(gameSituation.playerPositions);
+          },
+          
+          "---> get the scene descriptions from GET route": {
+            topic: api.get("/fcb/situations"),
+            "should return with the situation data": function(err, req, body) {
+              assert.isNull(err);
+              for ( key in req.body ) {
+                var situation = JSON.parse(req.body[key]);
+                assert.equal("1-0", situation.score);
+                assert.equal("Servette", situation.opponent);
+                assert.equal(false, situation.homematch);
+                assert.equal("m", situation.competition);
+                //console.log(situation);
+              }
+            }
           }
-    //      console.log(replies);
         }
-      }
-    }  
+      }  
+    }
+  },
+  
+  teardown: function() {
+    redisClient.del("FCB");
+    redisClient.del("Games");
+    redisClient.del("Situations");
   }
-  
-  
   
 }).export(module);

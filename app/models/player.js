@@ -81,5 +81,38 @@ var Player = function(team, spreadsheetNotation) {
   };
 };
 
+// ==========================
+// class methods
+// ==========================
+Player.parseValidateAndSaveSpreadsheet = function(dbHandler, spreadsheetList, callback) {
+  var players = [];
+  var errors = [];
+  for ( var i = 0; i < spreadsheetList.length; i++ ) {
+    var player = new Player("FCB", spreadsheetList[i]);
+    player.parse();
+    player.validate();
+    errors = _.union(errors, player.validationErrors);
+    players.push(player);
+  }
+  
+  if ( errors.length > 0 ) {
+    var errorString = "";
+    for ( i = 0; i < errors.length; i++ ) {
+      errorString = errorString + "validation error:\n" + errors[i] + "\n";
+    }
+
+    return callback(errorString, 500);
+  } else {
+    // redis operations
+    dbHandler.del("FCB"); // delete the players hash
+    for ( i = 0; i < players.length; i++ ) {
+      dbHandler.hset("FCB", players[i].nickname, JSON.stringify(players[i]));
+    }
+  
+    return callback("OK", 200);
+  }
+};
+
+
 // export
 module.exports = Player;
