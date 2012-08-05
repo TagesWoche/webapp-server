@@ -56,7 +56,7 @@ var GameSituation = function(spreadsheetNotation) {
   };
   
   // parse the player name position and special condition
-  var parsePlayerPositions = function(playerPositions) {
+  var parsePlayerPositions = function(playerPositions, players) {
     for ( var i = 0; i < playerPositions.length; i++ ) {
       var lastPlayerName,
           lastPlayerPosition,
@@ -147,9 +147,11 @@ var GameSituation = function(spreadsheetNotation) {
     if ( this.team.toLowerCase() == "fcb" ) {
       for ( var i = 0; i < this.playerPositions.length; i++ ) {
         // the name
-        if ( _.indexOf(players, this.playerPositions[i].name) == -1 ) {
+        //var number = players[this.playerPositions[i].name];
+        if ( !players[this.playerPositions[i].name] ) {
           this.validationErrors.push("The name " + this.playerPositions[i].name + " on line " + ( this.line ) + " is not a valid player name. Check the correct nicknames.");
-        }
+        } 
+        
         // the position
         for ( var n = 0; n < this.playerPositions[i].positions.length; n++ ) {
           var position = this.playerPositions[i].positions[n];
@@ -167,7 +169,7 @@ var GameSituation = function(spreadsheetNotation) {
   // instance methods
   // ==========================
   // parses the spreadsheet notation into object notation
-  this.parse = function() {
+  this.parse = function(players) {
     // easy fields
     this.date = new Date( Date.parse(this.spreadsheetNotation.date) );
     this.opponent = this.spreadsheetNotation.opponent;
@@ -193,7 +195,7 @@ var GameSituation = function(spreadsheetNotation) {
     // situation Notation
     var playerPositions = this.spreadsheetNotation.gameSituation.split("->");
     //console.log(playerPositions);
-    parsePlayerPositions.call(this, playerPositions);
+    parsePlayerPositions.call(this, playerPositions, players);
   };
   
   // validates the parsed fields
@@ -220,6 +222,15 @@ var GameSituation = function(spreadsheetNotation) {
     }
     return gameExists;
   };
+  
+  this.addPlayersData = function(players) {
+    _.each( this.playerPositions, function(playerPosition) {
+      var number = players[playerPosition.name];
+      if ( number ) {
+        playerPosition.number = number;
+      }
+    } );
+  }
 };
 
 // ==========================
@@ -227,11 +238,12 @@ var GameSituation = function(spreadsheetNotation) {
 // ==========================
 GameSituation.parseValidateAndSaveSpreadsheet = function(dbHandler, spreadsheetList, callback) {
   // load the players (only nicknames)
-  var players = [];
-  dbHandler.hkeys("FCB", function (err, replies) {
-    _.each(replies, function(nickname) {
-      //console.log("loading player: " + nickname);
-      players.push(nickname);
+  var players = {};
+  dbHandler.hgetall("FCB", function (err, replies) {
+    _.each(replies, function(entry) {
+      var player = JSON.parse(entry);
+      //console.log("loading player: " + player.nickname);
+      players[player.nickname] = player.number;
     });
     
     dbHandler.hgetall("Games", function (err, games) {      
@@ -241,6 +253,7 @@ GameSituation.parseValidateAndSaveSpreadsheet = function(dbHandler, spreadsheetL
         var gameSituation = new GameSituation(spreadsheetList[i]);
         gameSituation.parse();
         gameSituation.validate(players);
+        gameSituation.addPlayersData(players);
         var gameExists = gameSituation.addGameData(games);
         if ( gameExists === true ) {  // only save situations for games that are there
           errors = _.union(errors, gameSituation.validationErrors);
