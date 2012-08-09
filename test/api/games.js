@@ -3,6 +3,7 @@ var test = require("../setup"),
     vows = test.vows, assert = test.assert, api = test.api, 
     redis = require("redis"),
     _ = require('underscore')._,
+    fs = require("fs"),
     redisClient = redis.createClient(),
     controller = require("../../app/controllers/server"),
     spawn = require('child_process').spawn;        
@@ -65,7 +66,16 @@ vows.describe("fcb api").addBatch( {
         },
         
         "---> get the player statistics from GET route": {
-          
+          topic: api.get("/fcb/statistics"),
+          "should get players with statistics": function(err, req, body) {
+            assert.isNull(err);
+            assert.equal(req.body["Yann Sommer"].minutes, 96);
+            
+            var data = fs.readFileSync("test_data/flora_talin.json");
+            var jsonData = JSON.parse(data);
+            console.log(jsonData);
+            
+          }
         }
       }
     }  

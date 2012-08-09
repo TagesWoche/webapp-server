@@ -15,6 +15,14 @@ var logIncoming = function(req, res, next) {
   next();
 };
 
+
+//-----------------------------------------------------------------------------
+// H E L P E R S
+//-----------------------------------------------------------------------------
+var initStatistics = function() {
+  return { "played": 0, "goals": 0, "assits": 0, "minutes": 0, "yellowCards": 0, "yellowRedCards": 0, "redCards": 0 };
+};
+
 //-----------------------------------------------------------------------------
 // R O U T E S
 //-----------------------------------------------------------------------------
@@ -50,24 +58,41 @@ app.get("/fcb/situations", function(req, res, next) {
       gameSituationsExternal.list.push(gameSituationExternal);
     }
     
-    return res.json( gameSituationsExternal, 200);
+    return res.json( gameSituationsExternal, 200 );
   });
 });
 
-app.get("/fcb/games", function(req, res, next) {
+app.get("/fcb/statistics", function(req, res, next) {
   app.redisClient.hgetall("FCB", function(err, players) {
     // construct player data
-    playerNames = [];
-    for ( var player in players ) {
-      playerNames.push( JSON.parse(player).name );
+    playerStatistics = {};
+    for ( var rawPlayer in players ) {
+      var player = JSON.parse(players[rawPlayer]);
+      playerStatistics[player.name] = initStatistics();
+      playerStatistics[player.name].order = player.line;
     }
+    
     app.redisClient.hgetall("Games", function(err, games) {
       for ( var rawGame in games ) {
-        var gameEntry = JSON.parse(rawGame);
-        
+        var gameEntry = JSON.parse(games[rawGame]);
+        for ( var i = 0; i < gameEntry.players.length; i++ ) {
+          var player = gameEntry.players[i];
+          if ( playerStatistics[player.name] ) {
+            playerStatistics[player.name].minutes += player.minutesPlayed;
+            playerStatistics[player.name].played += 1;
+            playerStatistics[player.name].goals += player.goals;
+            playerStatistics[player.name].assists += player.assists;
+            if ( player.yellowCard )
+              playerStatistics[player.name].yellowCards += 1;
+            if ( player.yellowRedCard )
+              playerStatistics[player.name].yellowRedCards += 1;
+            if ( player.redCard )
+              playerStatistics[player.name].redCards += 1;
+          }
+        }
       }
       
-      
+      return res.json( playerStatistics, 200 );
     });
   });
 });

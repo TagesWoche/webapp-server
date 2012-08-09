@@ -1,6 +1,6 @@
 {
   "name": "tageswoche",
-  "version": "0.0.1-52",
+  "version": "0.0.1-54",
   "subdomain": "tageswoche",
   "author": {
     "name": "Gabriel Hase",
@@ -14,7 +14,7 @@
     "start": "node ./bin/server"
   },
   "engines": {
-    "node": "0.6.x"
+    "node": "0.8.x"
   },
   "dependencies": {
     "express": "2.5.x",
