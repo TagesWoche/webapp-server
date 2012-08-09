@@ -25,6 +25,7 @@ app.configure('production', function() {
 });
 
 app.configure('development', function() {
+  console.log("setting development configuration...");
   app.redisClient = redis.createClient();
   serverPort = 3000;
   
@@ -32,6 +33,7 @@ app.configure('development', function() {
 });
 
 app.configure("test", function() {
+  console.log("setting test configuration...");
   app.redisClient = redis.createClient();
   serverPort = 3010;
 });
