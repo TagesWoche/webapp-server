@@ -62,6 +62,10 @@ vows.describe("fcb api").addBatch( {
         "should get the games from redis": function(err, replies) {
           assert.isNull(err);
           assert.equal(1, replies.length);
+        },
+        
+        "---> get the player statistics from GET route": {
+          
         }
       }
     }  

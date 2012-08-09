@@ -54,6 +54,24 @@ app.get("/fcb/situations", function(req, res, next) {
   });
 });
 
+app.get("/fcb/games", function(req, res, next) {
+  app.redisClient.hgetall("FCB", function(err, players) {
+    // construct player data
+    playerNames = [];
+    for ( var player in players ) {
+      playerNames.push( JSON.parse(player).name );
+    }
+    app.redisClient.hgetall("Games", function(err, games) {
+      for ( var rawGame in games ) {
+        var gameEntry = JSON.parse(rawGame);
+        
+      }
+      
+      
+    });
+  });
+});
+
 // updates the games
 app.post('/fcb/games', logIncoming, function(req, res, next) {
   Game.parseValidateAndSaveSpreadsheet(app.redisClient, req.body.list, function(message, status) {
