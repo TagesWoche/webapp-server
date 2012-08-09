@@ -1,6 +1,6 @@
 // VARIABLES
 var application_root = __dirname + "/..",
-    express = require("express")
+    express = require("express"),
     path = require("path"),
     redis = require("redis"),
     serverPort = 8080;
@@ -15,6 +15,7 @@ app.configure(function () {
 
 // PROD
 app.configure('production', function() {
+  console.log("setting prod configuration...");
   app.redisClient = redis.createClient(9111, "barb.redistogo.com");
   // authenticate redis db
   app.redisClient.auth("93fbe3baf4c48b4ec1b3a4f5522937c8");
@@ -24,13 +25,8 @@ app.configure('production', function() {
 });
 
 app.configure('development', function() {
-  app.redisClient = redis.createClient(9111, "barb.redistogo.com");
-  // authenticate redis db
-  app.redisClient.auth("93fbe3baf4c48b4ec1b3a4f5522937c8");
-  app.use(express.logger());
-    // 
-    // app.redisClient = redis.createClient();
-    // serverPort = 3000;
+  app.redisClient = redis.createClient();
+  serverPort = 3000;
   
   app.enable("jsonp callback");
 });
