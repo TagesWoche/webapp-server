@@ -10,8 +10,8 @@ var app = require("../../config/server"),
 //-----------------------------------------------------------------------------
 // logs the body of an incoming request
 var logIncoming = function(req, res, next) {
-  //console.log("got incoming traffic on: " + req.url);
-  //console.log(req.body);
+  console.log("got incoming traffic on: " + req.url);
+  console.log(req.body);
   next();
 };
 
@@ -143,6 +143,9 @@ app.get("/fcb/statistics", function(req, res, next) {
     // })
     
     app.redisClient.hgetall("Games", function(err, games) {
+      games = _.sortBy(games, function(game){
+        return game;
+      });
       for ( var rawGame in games ) {
         var gameEntry = JSON.parse(games[rawGame]);
         if ( matchesGameFilter(gameEntry, req.query) ) {

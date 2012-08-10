@@ -82,6 +82,7 @@ vows.describe("fcb api").addBatch( {
             assert.equal(req.body.list[10].assists, 2);    
             assert.equal(req.body.list[25].averageGrade, (3.5+5+3+5)/4);   
             assert.equal(req.body.list[4].yellowCards, 1);
+            assert.deepEqual(req.body.list[0].grades, [4.5, 0, 6, 0, 5.5, 4.5, 5, 5]);
           },
           
           "----> get the player statistics only for home plays": {
