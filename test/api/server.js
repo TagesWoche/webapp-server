@@ -63,19 +63,16 @@ vows.describe("fcb api").addBatch( {
         },
         "should get the games from redis": function(err, replies) {
           assert.isNull(err);
-          assert.equal(1, replies.length);
+          assert.equal(replies.length, 8);
         },
         
         "---> get the player statistics from GET route": {
           topic: api.get("/fcb/statistics"),
           "should get players with statistics": function(err, req, body) {
             assert.isNull(err);
-            assert.equal(req.body["Yann Sommer"].minutes, 96);
-            
-            //var data = fs.readFileSync("test_data/flora_talin.json");
-            //var jsonData = JSON.parse(data);
-            //console.log(jsonData);
-            
+            assert.equal(req.body["Yann Sommer"].minutes, 655);     
+            assert.equal(req.body["Alexander Frei"].goals, 4);
+            assert.equal(req.body["Markus Steinhöfer"].assists, 2);       
           }
         }
       }

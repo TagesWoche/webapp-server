@@ -82,10 +82,10 @@ var Game = function(spreadsheetNotation) {
       // player stuff
       var player = {};
       player.name = this.spreadsheetNotation[i].player;
-      player.minutesPlayed = this.spreadsheetNotation[i].minutesPlayed;
-      player.grade = this.spreadsheetNotation[i].grade;
-      player.goals = this.spreadsheetNotation[i].goals;
-      player.assists = this.spreadsheetNotation[i].assists;
+      player.minutesPlayed = +this.spreadsheetNotation[i].minutesPlayed;
+      player.grade = +this.spreadsheetNotation[i].grade;
+      player.goals = +this.spreadsheetNotation[i].goals;
+      player.assists = +this.spreadsheetNotation[i].assists;
       if ( this.spreadsheetNotation[i].yellowCard === 'x' ) {
         player.yellowCard = true;
       } else {
