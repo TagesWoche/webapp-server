@@ -27,7 +27,7 @@ var GameSituation = function(spreadsheetNotation) {
   this.parseErrors = [];
   this.validationErrors = [];
   this.playerPositions = [];  // TODO: maybe put this into its own object
-  this.playerPositionPartsPattern = new RegExp(/(\w{1}.\s*\w+)\s*([A-Z]\d{1,2})\s*(\(.*\))?/);
+  this.playerPositionPartsPattern = new RegExp(/(\w{1}.\s*[A-Z,a-z,ö,ä,ü,é,è,ê]+)\s*([A-Z]\d{1,2})\s*(\(.*\))?/);
   this.positionPattern = new RegExp(/[A-R]\d{1,2}/);
   this.specialConditionsPattern = new RegExp(/\((FD|FI|E|P|PS|EW|F:\s*.*)\)/);
   
