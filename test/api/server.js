@@ -33,9 +33,9 @@ vows.describe("fcb api").addBatch( {
   },
   
   teardown: function() {
-    //redisClient.del("FCB");
-    //redisClient.del("Games");
-    //redisClient.del("Situations");
+    redisClient.del("FCB");
+    redisClient.del("Games");
+    redisClient.del("Situations");
   }
   
 }).addBatch( { 
@@ -72,7 +72,17 @@ vows.describe("fcb api").addBatch( {
             assert.isNull(err);
             assert.equal(req.body["Yann Sommer"].minutes, 655);     
             assert.equal(req.body["Alexander Frei"].goals, 4);
-            assert.equal(req.body["Markus Steinhöfer"].assists, 2);       
+            assert.equal(req.body["Markus Steinhöfer"].assists, 2);    
+            assert.equal(req.body["Jacques Zoua Daogari"].averageGrade, (3.5+5+3+5)/4);   
+            assert.equal(req.body["Philipp Degen"].yellowCards, 1);
+          },
+          
+          "----> get the player statistics only for home plays": {
+            topic: api.get("/fcb/statistics?location=home"),
+            "should get the player statistics for home plays": function(err, req, body) {
+              assert.isNull(err);
+              assert.equal(req.body["David Degen"].minutes, 249);
+            }
           }
         }
       }
@@ -80,9 +90,9 @@ vows.describe("fcb api").addBatch( {
   },
   
   teardown: function() {
-    //redisClient.del("FCB");
-    //redisClient.del("Games");
-    //redisClient.del("Situations");
+    redisClient.del("FCB");
+    redisClient.del("Games");
+    redisClient.del("Situations");
   }
     
 }).addBatch( {
@@ -149,9 +159,9 @@ vows.describe("fcb api").addBatch( {
   },
   
   teardown: function() {
-    //redisClient.del("FCB");
-    //redisClient.del("Games");
-    //redisClient.del("Situations");
+    redisClient.del("FCB");
+    redisClient.del("Games");
+    redisClient.del("Situations");
   }
   
 }).export(module);

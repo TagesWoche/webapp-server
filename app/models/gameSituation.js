@@ -143,7 +143,7 @@ var GameSituation = function(spreadsheetNotation) {
   
   // validates the score position field
   var validateScorePosition = function() {
-    if ( _.indexOf(allowedScorePositions, this.scorePosition) == -1 ) {
+    if ( _.indexOf(allowedScorePositions, this.scorePosition.slice(0,2)) == -1 ) {
       this.validationErrors.push("On line " + ( this.line ) + " usage of unknown score Position. Legal values are: " + allowedScorePositions.toString());
     }
     // TODO: validate Gehalten special case

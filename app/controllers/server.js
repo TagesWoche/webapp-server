@@ -10,8 +10,8 @@ var app = require("../../config/server"),
 //-----------------------------------------------------------------------------
 // logs the body of an incoming request
 var logIncoming = function(req, res, next) {
-  console.log("got incoming traffic on: " + req.url);
-  console.log(req.body);
+  //console.log("got incoming traffic on: " + req.url);
+  //console.log(req.body);
   next();
 };
 
@@ -20,7 +20,20 @@ var logIncoming = function(req, res, next) {
 // H E L P E R S
 //-----------------------------------------------------------------------------
 var initStatistics = function() {
-  return { "played": 0, "goals": 0, "assits": 0, "minutes": 0, "yellowCards": 0, "yellowRedCards": 0, "redCards": 0 };
+  return { "played": 0, "goals": 0, "assists": 0, "minutes": 0, "yellowCards": 0, "yellowRedCards": 0, "redCards": 0, "grades": [] };
+};
+
+var matchesGameFilter = function(game, filters) {
+  if ( filters.location ) {
+    if ( (filters.location === "home" && game.homematch === true) ||
+         (filters.location === "out" && game.homematch === false) ) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+  
+  return true;
 };
 
 //-----------------------------------------------------------------------------
@@ -35,7 +48,7 @@ app.get("/testdata/games", function(req, res, next) {
   app.redisClient.hgetall("Games", function(err, replies) {
     var rawData = {};
     rawData.list = [];
-    for ( var key in replies ) {
+    for ( var key in replies ) {
       var game = JSON.parse(replies[key]);
       rawData.list.push(game.spreadsheetNotation);
     }
@@ -114,20 +127,38 @@ app.get("/fcb/statistics", function(req, res, next) {
     app.redisClient.hgetall("Games", function(err, games) {
       for ( var rawGame in games ) {
         var gameEntry = JSON.parse(games[rawGame]);
-        for ( var i = 0; i < gameEntry.players.length; i++ ) {
-          var player = gameEntry.players[i];
-          if ( playerStatistics[player.name] ) {
-            playerStatistics[player.name].minutes += +player.minutesPlayed;
-            playerStatistics[player.name].played += 1;
-            playerStatistics[player.name].goals += +player.goals;
-            playerStatistics[player.name].assists += +player.assists;
-            if ( player.yellowCard )
-              playerStatistics[player.name].yellowCards += 1;
-            if ( player.yellowRedCard )
-              playerStatistics[player.name].yellowRedCards += 1;
-            if ( player.redCard )
-              playerStatistics[player.name].redCards += 1;
+        if ( matchesGameFilter(gameEntry, req.query) ) {
+          for ( var i = 0; i < gameEntry.players.length; i++ ) {
+            var player = gameEntry.players[i];
+            if ( playerStatistics[player.name] ) {
+              playerStatistics[player.name].minutes += +player.minutesPlayed;
+              playerStatistics[player.name].played += 1;
+              playerStatistics[player.name].goals += +player.goals;
+              playerStatistics[player.name].assists += +player.assists;
+              playerStatistics[player.name].grades.push(+player.grade);
+            
+              if ( player.yellowCard )
+                playerStatistics[player.name].yellowCards += 1;
+              if ( player.yellowRedCard )
+                playerStatistics[player.name].yellowRedCards += 1;
+              if ( player.redCard )
+                playerStatistics[player.name].redCards += 1;
+            }
           }
+        }
+        
+        // calc the average grade
+        for ( var key in playerStatistics ) {
+          var gradedCount = 0;
+          var sum = _.reduce(playerStatistics[key].grades, function(memo, num) { 
+            if ( num && num > 0 ) {
+              gradedCount += 1;
+              return memo + num;
+            } else {
+              return memo;
+            }
+          }, 0);
+          playerStatistics[key].averageGrade = sum / gradedCount;
         }
       }
       
