@@ -10,8 +10,8 @@ var app = require("../../config/server"),
 //-----------------------------------------------------------------------------
 // logs the body of an incoming request
 var logIncoming = function(req, res, next) {
-  //console.log("got incoming traffic on: " + req.url);
-  //console.log(req.body);
+  console.log("got incoming traffic on: " + req.url);
+  console.log(req.body);
   next();
 };
 
@@ -78,10 +78,10 @@ app.get("/fcb/statistics", function(req, res, next) {
         for ( var i = 0; i < gameEntry.players.length; i++ ) {
           var player = gameEntry.players[i];
           if ( playerStatistics[player.name] ) {
-            playerStatistics[player.name].minutes += player.minutesPlayed;
+            playerStatistics[player.name].minutes += +player.minutesPlayed;
             playerStatistics[player.name].played += 1;
-            playerStatistics[player.name].goals += player.goals;
-            playerStatistics[player.name].assists += player.assists;
+            playerStatistics[player.name].goals += +player.goals;
+            playerStatistics[player.name].assists += +player.assists;
             if ( player.yellowCard )
               playerStatistics[player.name].yellowCards += 1;
             if ( player.yellowRedCard )
