@@ -31,6 +31,45 @@ app.get("/", function(req, res, next) {
   return res.send("Welcome to tageswoche nodejitsu setup. Up and running.");
 });
 
+app.get("/testdata/games", function(req, res, next) {
+  app.redisClient.hgetall("Games", function(err, replies) {
+    var rawData = {};
+    rawData.list = [];
+    for ( var key in replies ) {
+      var game = JSON.parse(replies[key]);
+      rawData.list.push(game.spreadsheetNotation);
+    }
+    
+    return res.json( rawData, 200 );
+  });
+});
+
+app.get("/testdata/situations", function(req, res, next) {
+  app.redisClient.hgetall("Situations", function(err, replies) {
+    var rawData = {};
+    rawData.list = [];
+    for ( var key in replies ) {
+      var situation = JSON.parse(replies[key]);
+      rawData.list.push(situation.spreadsheetNotation);
+    }
+    
+    return res.json( rawData, 200 );
+  });
+});
+
+app.get("/testdata/players", function(req, res, next) {
+  app.redisClient.hgetall("FCB", function(err, replies) {
+    var rawData = {};
+    rawData.list = [];
+    for ( var key in replies ) {
+      var player = JSON.parse(replies[key]);
+      rawData.list.push(player.spreadsheetNotation);
+    }
+    
+    return res.json( rawData, 200 );
+  });
+});
+
 // get all saved situations
 app.get("/fcb/situations", function(req, res, next) {
   app.redisClient.hgetall("Situations", function(err, replies) {

@@ -85,7 +85,7 @@ var Game = function(spreadsheetNotation) {
       player.minutesPlayed = this.spreadsheetNotation[i].minutesPlayed;
       player.grade = this.spreadsheetNotation[i].grade;
       player.goals = this.spreadsheetNotation[i].goals;
-      player.assits = this.spreadsheetNotation[i].assists;
+      player.assists = this.spreadsheetNotation[i].assists;
       if ( this.spreadsheetNotation[i].yellowCard === 'x' ) {
         player.yellowCard = true;
       } else {

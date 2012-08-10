@@ -33,9 +33,9 @@ vows.describe("fcb api").addBatch( {
   },
   
   teardown: function() {
-    redisClient.del("FCB");
-    redisClient.del("Games");
-    redisClient.del("Situations");
+    //redisClient.del("FCB");
+    //redisClient.del("Games");
+    //redisClient.del("Situations");
   }
   
 }).addBatch( { 
@@ -83,9 +83,9 @@ vows.describe("fcb api").addBatch( {
   },
   
   teardown: function() {
-    redisClient.del("FCB");
-    redisClient.del("Games");
-    redisClient.del("Situations");
+    //redisClient.del("FCB");
+    //redisClient.del("Games");
+    //redisClient.del("Situations");
   }
     
 }).addBatch( {
@@ -152,9 +152,9 @@ vows.describe("fcb api").addBatch( {
   },
   
   teardown: function() {
-    redisClient.del("FCB");
-    redisClient.del("Games");
-    redisClient.del("Situations");
+    //redisClient.del("FCB");
+    //redisClient.del("Games");
+    //redisClient.del("Situations");
   }
   
 }).export(module);
