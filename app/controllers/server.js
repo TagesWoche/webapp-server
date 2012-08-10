@@ -36,6 +36,19 @@ var matchesGameFilter = function(game, filters) {
   return true;
 };
 
+var calcAverageGrade = function(grades) {
+  var gradedCount = 0;
+  var sum = _.reduce(grades, function(memo, num) { 
+    if ( num && num > 0 ) {
+      gradedCount += 1;
+      return memo + num;
+    } else {
+      return memo;
+    }
+  }, 0);
+  return sum / gradedCount;
+};
+
 //-----------------------------------------------------------------------------
 // R O U T E S
 //-----------------------------------------------------------------------------
@@ -122,7 +135,12 @@ app.get("/fcb/statistics", function(req, res, next) {
       var player = JSON.parse(players[rawPlayer]);
       playerStatistics[player.name] = initStatistics();
       playerStatistics[player.name].order = player.line;
+      playerStatistics[player.name].name = player.name;
     }
+    
+    // playerStatistics = _.sortBy(playerStatistics, function(player) {
+    //   return player.order;
+    // })
     
     app.redisClient.hgetall("Games", function(err, games) {
       for ( var rawGame in games ) {
@@ -146,23 +164,19 @@ app.get("/fcb/statistics", function(req, res, next) {
             }
           }
         }
-        
-        // calc the average grade
-        for ( var key in playerStatistics ) {
-          var gradedCount = 0;
-          var sum = _.reduce(playerStatistics[key].grades, function(memo, num) { 
-            if ( num && num > 0 ) {
-              gradedCount += 1;
-              return memo + num;
-            } else {
-              return memo;
-            }
-          }, 0);
-          playerStatistics[key].averageGrade = sum / gradedCount;
-        }
+      }
+    
+      // calc the average grade and package into array
+      for ( var key in playerStatistics ) {
+        playerStatistics[key].averageGrade = calcAverageGrade(playerStatistics[key].grades);
       }
       
-      return res.json( playerStatistics, 200 );
+      // sort by the order
+      var playerStatisticsList = _.sortBy(playerStatistics, function(player) {
+        return player.order;
+      });
+      
+      return res.json( { list: playerStatisticsList }, 200 );
     });
   });
 });

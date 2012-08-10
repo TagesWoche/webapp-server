@@ -70,18 +70,25 @@ vows.describe("fcb api").addBatch( {
           topic: api.get("/fcb/statistics"),
           "should get players with statistics": function(err, req, body) {
             assert.isNull(err);
-            assert.equal(req.body["Yann Sommer"].minutes, 655);     
-            assert.equal(req.body["Alexander Frei"].goals, 4);
-            assert.equal(req.body["Markus Steinhöfer"].assists, 2);    
-            assert.equal(req.body["Jacques Zoua Daogari"].averageGrade, (3.5+5+3+5)/4);   
-            assert.equal(req.body["Philipp Degen"].yellowCards, 1);
+            console.log(req.body);
+            assert.equal(req.body.list[0].name, "Yann Sommer");
+            assert.equal(req.body.list[23].name, "Alexander Frei");
+            assert.equal(req.body.list[10].name, "Markus Steinhöfer");
+            assert.equal(req.body.list[25].name, "Jacques Zoua Daogari");
+            assert.equal(req.body.list[4].name, "Philipp Degen");
+            
+            assert.equal(req.body.list[0].minutes, 655);     
+            assert.equal(req.body.list[23].goals, 4);
+            assert.equal(req.body.list[10].assists, 2);    
+            assert.equal(req.body.list[25].averageGrade, (3.5+5+3+5)/4);   
+            assert.equal(req.body.list[4].yellowCards, 1);
           },
           
           "----> get the player statistics only for home plays": {
             topic: api.get("/fcb/statistics?location=home"),
             "should get the player statistics for home plays": function(err, req, body) {
               assert.isNull(err);
-              assert.equal(req.body["David Degen"].minutes, 249);
+              assert.equal(req.body.list[12].minutes, 249); // David Degen
             }
           }
         }
