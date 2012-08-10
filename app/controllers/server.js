@@ -10,8 +10,8 @@ var app = require("../../config/server"),
 //-----------------------------------------------------------------------------
 // logs the body of an incoming request
 var logIncoming = function(req, res, next) {
-  console.log("got incoming traffic on: " + req.url);
-  console.log(req.body);
+  //console.log("got incoming traffic on: " + req.url);
+  //console.log(req.body);
   next();
 };
 

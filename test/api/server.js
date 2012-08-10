@@ -20,11 +20,12 @@ vows.describe("fcb api").addBatch( {
     "-> get the players from the redis database": {
       topic: function() {
         var cb = this.callback;
-        redisClient.hkeys("FCB", function (err, replies) {
+        redisClient.hgetall("FCB", function (err, replies) {
           cb(err, replies);
         });
       },
       "should have received the players from the redis database": function(err, replies) {
+        console.log(replies);
         assert.isNull(err);
         assert.equal(27, replies.length);
       }
@@ -71,9 +72,9 @@ vows.describe("fcb api").addBatch( {
             assert.isNull(err);
             assert.equal(req.body["Yann Sommer"].minutes, 96);
             
-            var data = fs.readFileSync("test_data/flora_talin.json");
-            var jsonData = JSON.parse(data);
-            console.log(jsonData);
+            //var data = fs.readFileSync("test_data/flora_talin.json");
+            //var jsonData = JSON.parse(data);
+            //console.log(jsonData);
             
           }
         }
