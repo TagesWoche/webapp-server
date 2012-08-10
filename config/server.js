@@ -4,7 +4,7 @@ var application_root = __dirname + "/..",
     path = require("path"),
     redis = require("redis"),
     redisUrl = require('redis-url'),
-    serverPort = 8080;
+    serverPort = process.env.PORT;
     
 // EXPRESS
 var app = express.createServer();
