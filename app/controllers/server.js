@@ -20,7 +20,7 @@ var logIncoming = function(req, res, next) {
 // H E L P E R S
 //-----------------------------------------------------------------------------
 var initStatistics = function() {
-  return { "played": 0, "goals": 0, "assists": 0, "minutes": 0, "yellowCards": 0, "yellowRedCards": 0, "redCards": 0, "grades": [] };
+  return { "played": 0, "goals": 0, "assists": 0, "minutes": 0, "yellowCards": 0, "yellowRedCards": 0, "redCards": 0, "grades": [], "minutesList": [] };
 };
 
 var matchesGameFilter = function(game, filters) {
@@ -149,6 +149,7 @@ app.get("/fcb/statistics", function(req, res, next) {
           for ( var i = 0; i < gameEntry.players.length; i++ ) {
             var player = gameEntry.players[i];
             if ( playerStatistics[player.name] ) {
+              playerStatistics[player.name].minutesList.push(+player.minutesPlayed);
               playerStatistics[player.name].minutes += +player.minutesPlayed;
               playerStatistics[player.name].played += 1;
               playerStatistics[player.name].goals += +player.goals;
