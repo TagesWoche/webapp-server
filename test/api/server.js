@@ -20,12 +20,12 @@ vows.describe("fcb api").addBatch( {
     "-> get the players from the redis database": {
       topic: function() {
         var cb = this.callback;
-        redisClient.hgetall("FCB", function (err, replies) {
+        redisClient.hkeys("FCB", function (err, replies) {
           cb(err, replies);
         });
       },
       "should have received the players from the redis database": function(err, replies) {
-        console.log(replies);
+        //console.log(replies);
         assert.isNull(err);
         assert.equal(27, replies.length);
       }
