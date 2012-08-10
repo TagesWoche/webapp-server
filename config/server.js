@@ -3,6 +3,7 @@ var application_root = __dirname + "/..",
     express = require("express"),
     path = require("path"),
     redis = require("redis"),
+    redisUrl = require('redis-url'),
     serverPort = 8080;
     
 // EXPRESS
@@ -15,10 +16,12 @@ app.configure(function () {
 
 // PROD
 app.configure('production', function() {
-  app.redisClient = redis.createClient(9111, "barb.redistogo.com");
+  //app.redisClient = redis.createClient(9111, "barb.redistogo.com");
   // authenticate redis db
-  app.redisClient.auth("93fbe3baf4c48b4ec1b3a4f5522937c8");
-  //app.use(express.logger());
+  //app.redisClient.auth("93fbe3baf4c48b4ec1b3a4f5522937c8");
+  app.redisClient = redisUrl.connect(process.env.REDISTOGO_URL);
+  
+  app.use(express.logger());
 
   app.enable("jsonp callback");
   

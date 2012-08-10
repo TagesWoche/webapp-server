@@ -5,15 +5,13 @@
     "name": "Gabriel Hase",
     "email": "gabriel@upfront.io"
   },
-  "repository": {
-    "type": "git",
-    "url": "git://https://github.com/peyerluk/Tageswoche.git"
-  },
   "engines": {
-    "node": "0.8.x"
+    "node": "0.8.x",
+    "npm": "1.1.x"
   },
   "dependencies": {
     "express": "2.5.x",
+    "redis-url": "0.1.0",
     "redis": "0.7.x",
     "hiredis": "0.1.x",
     "underscore": "*"
