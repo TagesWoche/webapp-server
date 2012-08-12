@@ -154,7 +154,9 @@ app.get("/fcb/statistics", function(req, res, next) {
             if ( playerStatistics[player.name] ) {
               playerStatistics[player.name].minutesList.push(+player.minutesPlayed);
               playerStatistics[player.name].minutes += +player.minutesPlayed;
-              playerStatistics[player.name].played += 1;
+              if ( +player.minutesPlayed > 0 ) {
+                playerStatistics[player.name].played += 1;
+              }
               playerStatistics[player.name].goals += +player.goals;
               playerStatistics[player.name].assists += +player.assists;
               playerStatistics[player.name].grades.push(+player.grade);
