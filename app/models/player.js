@@ -63,12 +63,14 @@ var Player = function(team, spreadsheetNotation) {
     this.position = this.spreadsheetNotation.position;
     this.birthday = new Date(Date.parse(this.spreadsheetNotation.birthday));
     this.nationality = this.spreadsheetNotation.nationality;
-    // this.size = spreadsheetNotation.size;
-    // this.weight = spreadsheetNotation.weight;
-    // this.strongFoot = spreadsheetNotation.strongFoot;
-    // this.FCBSince = spreadsheetNotation.FCBSince;
-    // this.lastTeam = spreadsheetNotation.lastTeam;
-    // this.contractUntil = spreadsheetNotation.contractUntil;
+    this.size = spreadsheetNotation.size;
+    this.weight = spreadsheetNotation.weight;
+    this.strongFoot = spreadsheetNotation.strongFoot;
+    this.FCBSince = spreadsheetNotation.FCBSince;
+    this.lastTeam = spreadsheetNotation.lastTeam;
+    this.contractUntil = spreadsheetNotation.contractUntil;
+    this.networth = spreadsheetNotation.networth;
+    this.imageUrl = spreadsheetNotation.image;
     
     this.line = this.spreadsheetNotation.line;
   };

@@ -136,6 +136,7 @@ app.get("/fcb/statistics", function(req, res, next) {
       playerStatistics[player.name] = initStatistics();
       playerStatistics[player.name].order = player.line;
       playerStatistics[player.name].name = player.name;
+      playerStatistics[player.name].imageUrl = player.imageUrl;
     }
     
     // playerStatistics = _.sortBy(playerStatistics, function(player) {
