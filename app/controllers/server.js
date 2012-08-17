@@ -196,9 +196,9 @@ app.get("/fcb/statistics", function(req, res, next) {
       });
       var gamesCount = 0;
       for ( var rawGame in games ) {
-        gamesCount += 1;
         var gameEntry = JSON.parse(games[rawGame]);   // a game with all players in a collection
         if ( matchesGameFilter(gameEntry, req.query) ) {
+          gamesCount += 1;
           var gameGrades = [];
           for ( var i = 0; i < gameEntry.players.length; i++ ) {
             var player = gameEntry.players[i];        // an entry from the player collection in a game -> one player in one game
