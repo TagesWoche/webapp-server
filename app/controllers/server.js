@@ -194,7 +194,9 @@ app.get("/fcb/statistics", function(req, res, next) {
       games = _.sortBy(games, function(game){
         return game;
       });
+      var gamesCount = 0;
       for ( var rawGame in games ) {
+        gamesCount += 1;
         var gameEntry = JSON.parse(games[rawGame]);   // a game with all players in a collection
         if ( matchesGameFilter(gameEntry, req.query) ) {
           var gameGrades = [];
@@ -215,6 +217,11 @@ app.get("/fcb/statistics", function(req, res, next) {
     
       // calc the average grade and package into array
       for ( var key in playerStatistics ) {
+        // fill up with 0's for players that were not in the Kader yet
+        while ( gamesCount > playerStatistics[key].grades.length ) {
+          playerStatistics[key].grades.unshift( { grade: 0, averageGameGrade: 0, opponent: "Noch nicht im Kader" })
+        }
+        
         playerStatistics[key].averageGrade = calcAverageGrade(playerStatistics[key].grades);
       }
       

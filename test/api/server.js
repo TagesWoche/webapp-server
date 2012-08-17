@@ -84,6 +84,7 @@ vows.describe("fcb api").addBatch( {
             assert.equal(req.body.list[25].averageGrade, (3.5+5+3+5)/4);   
             assert.equal(req.body.list[25].played, 8);
             assert.equal(req.body.list[4].yellowCards, 1);
+            assert.equal(req.body.list[17].grades.length, 8);
             assert.deepEqual(req.body.list[0].grades[0].grade, 4.5);
             assert.deepEqual(req.body.list[0].grades[1].grade, 0);
             assert.deepEqual(req.body.list[0].grades[2].grade, 6);
