@@ -72,6 +72,7 @@ vows.describe("fcb api").addBatch( {
             assert.isNull(err);
             //console.log(req.body);
             assert.equal(req.body.list[0].name, "Yann Sommer");
+            assert.equal(req.body.list[0].position, "TW");
             assert.equal(req.body.list[23].name, "Alexander Frei");
             assert.equal(req.body.list[10].name, "Markus Steinhöfer");
             assert.equal(req.body.list[25].name, "Jacques Zoua Daogari");

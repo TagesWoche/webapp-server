@@ -32,6 +32,7 @@ var initStatistics = function(player) {
            "nickname":          player.nickname,
            "number":            player.number,
            "imageUrl":          player.imageUrl,
+           "position":          player.position,
            "grades":            [], 
            "minutesList":       [] };
 };
