@@ -36,7 +36,7 @@ var initStatistics = function(player) {
            "minutesList":       [] };
 };
 
-var addGameToPlayersStatistic = function(player, playerStatistics) {
+var addGameToPlayersStatistic = function(player, playerStatistics, opponent) {
   playerStatistics[player.name].minutesList.push(+player.minutesPlayed);
   playerStatistics[player.name].minutes += +player.minutesPlayed;
   if ( +player.minutesPlayed > 0 ) {
@@ -44,7 +44,7 @@ var addGameToPlayersStatistic = function(player, playerStatistics) {
   }
   playerStatistics[player.name].goals += +player.goals;
   playerStatistics[player.name].assists += +player.assists;
-  playerStatistics[player.name].grades.push({ grade: +player.grade, gameAverageGrade: 0 });
+  playerStatistics[player.name].grades.push({ grade: +player.grade, gameAverageGrade: 0, opponent: opponent });
 
   if ( player.yellowCard )
     playerStatistics[player.name].yellowCards += 1;
@@ -52,6 +52,24 @@ var addGameToPlayersStatistic = function(player, playerStatistics) {
     playerStatistics[player.name].yellowRedCards += 1;
   if ( player.redCard )
     playerStatistics[player.name].redCards += 1;
+};
+
+var addGameAverageGradeToPlayersStatistics = function(gameGrades, gameEntry, playerStatistics) {  
+  var sum = _.reduce(gameGrades, function(sum, grade) {
+    return sum + grade;
+  }, 0);
+  var gameAverageGrade = sum / gameGrades.length;
+  if ( _.isNaN(gameAverageGrade) )
+    gameAverageGrade = 0;
+  
+  // push to player statistics
+  for ( var i = 0; i < gameEntry.players.length; i++ ) {
+    var player = gameEntry.players[i];
+    if ( playerStatistics[player.name] ) {
+      //console.log("setting gmae average grade: " + gameAverageGrade);
+      playerStatistics[player.name].grades[playerStatistics[player.name].grades.length - 1].gameAverageGrade = gameAverageGrade;
+    }
+  }
 };
 
 var matchesGameFilter = function(game, filters) {
@@ -161,6 +179,8 @@ app.get("/fcb/situations", function(req, res, next) {
   });
 });
 
+
+
 app.get("/fcb/statistics", function(req, res, next) {
   app.redisClient.hgetall("FCB", function(err, players) {
     // construct player data
@@ -181,29 +201,15 @@ app.get("/fcb/statistics", function(req, res, next) {
           for ( var i = 0; i < gameEntry.players.length; i++ ) {
             var player = gameEntry.players[i];        // an entry from the player collection in a game -> one player in one game
             if ( playerStatistics[player.name] ) {    // only do statistics for the current Kader              
-              addGameToPlayersStatistic(player, playerStatistics);
+              addGameToPlayersStatistic(player, playerStatistics, gameEntry.opponent);
               
               if ( +player.grade > 0 ) {
                 gameGrades.push(+player.grade);
               }
             }  
           }
-          var sum = _.reduce(gameGrades, function(sum, grade) {
-            return sum + grade;
-          }, 0);
-          var gameAverageGrade = sum / gameGrades.length;
-          if ( _.isNaN(gameAverageGrade) )
-            gameAverageGrade = 0;
           
-          // push to player statistics
-          for ( var i = 0; i < gameEntry.players.length; i++ ) {
-            var player = gameEntry.players[i];
-            if ( playerStatistics[player.name] ) {
-              //console.log("setting gmae average grade: " + gameAverageGrade);
-              playerStatistics[player.name].grades[playerStatistics[player.name].grades.length - 1].gameAverageGrade = gameAverageGrade;
-            }
-          }
-          
+          addGameAverageGradeToPlayersStatistics(gameGrades, gameEntry, playerStatistics);
         }
       }
     
