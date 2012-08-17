@@ -19,8 +19,39 @@ var logIncoming = function(req, res, next) {
 //-----------------------------------------------------------------------------
 // H E L P E R S
 //-----------------------------------------------------------------------------
-var initStatistics = function() {
-  return { "played": 0, "goals": 0, "assists": 0, "minutes": 0, "yellowCards": 0, "yellowRedCards": 0, "redCards": 0, "grades": [], "minutesList": [] };
+var initStatistics = function(player) {
+  return { "played":            0, 
+           "goals":             0, 
+           "assists":           0, 
+           "minutes":           0, 
+           "yellowCards":       0, 
+           "yellowRedCards":    0, 
+           "redCards":          0, 
+           "order":             player.line,
+           "name":              player.name,
+           "nickname":          player.nickname,
+           "number":            player.number,
+           "imageUrl":          player.imageUrl,
+           "grades":            [], 
+           "minutesList":       [] };
+};
+
+var addGameToPlayersStatistic = function(player, playerStatistics) {
+  playerStatistics[player.name].minutesList.push(+player.minutesPlayed);
+  playerStatistics[player.name].minutes += +player.minutesPlayed;
+  if ( +player.minutesPlayed > 0 ) {
+    playerStatistics[player.name].played += 1;
+  }
+  playerStatistics[player.name].goals += +player.goals;
+  playerStatistics[player.name].assists += +player.assists;
+  playerStatistics[player.name].grades.push({ grade: +player.grade, gameAverageGrade: 0 });
+
+  if ( player.yellowCard )
+    playerStatistics[player.name].yellowCards += 1;
+  if ( player.yellowRedCard )
+    playerStatistics[player.name].yellowRedCards += 1;
+  if ( player.redCard )
+    playerStatistics[player.name].redCards += 1;
 };
 
 var matchesGameFilter = function(game, filters) {
@@ -32,16 +63,15 @@ var matchesGameFilter = function(game, filters) {
       return false;
     }
   }
-  
   return true;
 };
 
 var calcAverageGrade = function(grades) {
   var gradedCount = 0;
-  var sum = _.reduce(grades, function(memo, num) { 
-    if ( num && num > 0 ) {
+  var sum = _.reduce(grades, function(memo, gradeEntry) { 
+    if ( gradeEntry && gradeEntry.grade && gradeEntry.grade > 0 ) {
       gradedCount += 1;
-      return memo + num;
+      return memo + gradeEntry.grade;
     } else {
       return memo;
     }
@@ -52,6 +82,10 @@ var calcAverageGrade = function(grades) {
 //-----------------------------------------------------------------------------
 // R O U T E S
 //-----------------------------------------------------------------------------
+
+app.post("/", logIncoming, function(req, res, next) {
+  return res.json({message: "OK"}, 200);
+});
 
 app.get("/", function(req, res, next) {
   return res.send("Welcome to tageswoche nodejitsu setup. Up and running.");
@@ -133,45 +167,43 @@ app.get("/fcb/statistics", function(req, res, next) {
     playerStatistics = {};
     for ( var rawPlayer in players ) {
       var player = JSON.parse(players[rawPlayer]);
-      playerStatistics[player.name] = initStatistics();
-      playerStatistics[player.name].order = player.line;
-      playerStatistics[player.name].name = player.name;
-      playerStatistics[player.name].nickname = player.nickname;
-      playerStatistics[player.name].number = player.number;
-      playerStatistics[player.name].imageUrl = player.imageUrl;
+      playerStatistics[player.name] = initStatistics(player);
     }
-    
-    // playerStatistics = _.sortBy(playerStatistics, function(player) {
-    //   return player.order;
-    // })
     
     app.redisClient.hgetall("Games", function(err, games) {
       games = _.sortBy(games, function(game){
         return game;
       });
       for ( var rawGame in games ) {
-        var gameEntry = JSON.parse(games[rawGame]);
+        var gameEntry = JSON.parse(games[rawGame]);   // a game with all players in a collection
         if ( matchesGameFilter(gameEntry, req.query) ) {
+          var gameGrades = [];
+          for ( var i = 0; i < gameEntry.players.length; i++ ) {
+            var player = gameEntry.players[i];        // an entry from the player collection in a game -> one player in one game
+            if ( playerStatistics[player.name] ) {    // only do statistics for the current Kader              
+              addGameToPlayersStatistic(player, playerStatistics);
+              
+              if ( +player.grade > 0 ) {
+                gameGrades.push(+player.grade);
+              }
+            }  
+          }
+          var sum = _.reduce(gameGrades, function(sum, grade) {
+            return sum + grade;
+          }, 0);
+          var gameAverageGrade = sum / gameGrades.length;
+          if ( _.isNaN(gameAverageGrade) )
+            gameAverageGrade = 0;
+          
+          // push to player statistics
           for ( var i = 0; i < gameEntry.players.length; i++ ) {
             var player = gameEntry.players[i];
             if ( playerStatistics[player.name] ) {
-              playerStatistics[player.name].minutesList.push(+player.minutesPlayed);
-              playerStatistics[player.name].minutes += +player.minutesPlayed;
-              if ( +player.minutesPlayed > 0 ) {
-                playerStatistics[player.name].played += 1;
-              }
-              playerStatistics[player.name].goals += +player.goals;
-              playerStatistics[player.name].assists += +player.assists;
-              playerStatistics[player.name].grades.push(+player.grade);
-            
-              if ( player.yellowCard )
-                playerStatistics[player.name].yellowCards += 1;
-              if ( player.yellowRedCard )
-                playerStatistics[player.name].yellowRedCards += 1;
-              if ( player.redCard )
-                playerStatistics[player.name].redCards += 1;
+              //console.log("setting gmae average grade: " + gameAverageGrade);
+              playerStatistics[player.name].grades[playerStatistics[player.name].grades.length - 1].gameAverageGrade = gameAverageGrade;
             }
           }
+          
         }
       }
     

@@ -70,7 +70,7 @@ vows.describe("fcb api").addBatch( {
           topic: api.get("/fcb/statistics"),
           "should get players with statistics": function(err, req, body) {
             assert.isNull(err);
-            console.log(req.body);
+            //console.log(req.body);
             assert.equal(req.body.list[0].name, "Yann Sommer");
             assert.equal(req.body.list[23].name, "Alexander Frei");
             assert.equal(req.body.list[10].name, "Markus Steinhöfer");
@@ -84,7 +84,18 @@ vows.describe("fcb api").addBatch( {
             assert.equal(req.body.list[25].averageGrade, (3.5+5+3+5)/4);   
             assert.equal(req.body.list[25].played, 8);
             assert.equal(req.body.list[4].yellowCards, 1);
-            assert.deepEqual(req.body.list[0].grades, [4.5, 0, 6, 0, 5.5, 4.5, 5, 5]);
+            assert.deepEqual(req.body.list[0].grades[0].grade, 4.5);
+            assert.deepEqual(req.body.list[0].grades[1].grade, 0);
+            assert.deepEqual(req.body.list[0].grades[2].grade, 6);
+            assert.deepEqual(req.body.list[0].grades[2].gameAverageGrade, 3.9545454545454546);
+            assert.deepEqual(req.body.list[0].grades[3].grade, 0);
+            assert.deepEqual(req.body.list[0].grades[4].grade, 5.5);
+            assert.deepEqual(req.body.list[0].grades[5].grade, 4.5);
+            assert.deepEqual(req.body.list[0].grades[5].gameAverageGrade, 4.541666666666667);
+            assert.deepEqual(req.body.list[0].grades[6].grade, 5);
+            assert.deepEqual(req.body.list[0].grades[7].grade, 5);
+            
+            //assert.deepEqual(req.body.list[0].grades, [{ grade: 4.5 }, { grade: 0 }, { grade: 6, gameAverageGrade: 3.9545454545454546 }, { grade: 0 }, { grade: 5.5 }, { grade: 4.5, gameAverageGrade: 4.541666666666667 }, { grade: 5 }, { grade: 5 }]);
           },
           
           "----> get the player statistics only for home plays": {
