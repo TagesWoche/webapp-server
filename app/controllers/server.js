@@ -34,6 +34,7 @@ var initStatistics = function(player) {
            "imageUrl":          player.imageUrl,
            "position":          player.position,
            "grades":            [], 
+           "scores":            [],  
            "minutesList":       [] };
 };
 
@@ -46,6 +47,8 @@ var addGameToPlayersStatistic = function(player, playerStatistics, opponent) {
   playerStatistics[player.name].goals += +player.goals;
   playerStatistics[player.name].assists += +player.assists;
   playerStatistics[player.name].grades.push({ grade: +player.grade, gameAverageGrade: 0, opponent: opponent });
+  playerStatistics[player.name].scores.push({ scores: [ +player.goals, +player.assists ], opponent: opponent });
+  
 
   if ( player.yellowCard )
     playerStatistics[player.name].yellowCards += 1;
