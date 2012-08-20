@@ -149,7 +149,7 @@ vows.describe("fcb api").addBatch( {
           "should get the games from redis": function(err, replies) {
             assert.isNull(err);
             //console.log(_.keys(replies).length);
-            assert.equal(1, _.keys(replies).length);
+            assert.equal(_.keys(replies).length, 2);
             
             var key, value;
             for (key in replies) {
@@ -160,6 +160,13 @@ vows.describe("fcb api").addBatch( {
                 assert.equal(2, gameSituation.playerPositions[1].positions.length);
                 assert.equal(3, gameSituation.playerPositions[1].number); // Park
               }
+              // situation 4 has a Lattenschuss
+              if ( key == 4 ) {
+                assert.equal(gameSituation.playerPositions.length, 3);
+                assert.equal(gameSituation.playerPositions[1].specialCondition, "G");
+                assert.equal(gameSituation.playerPositions[1].triedToScore, "OM");
+                assert.equal(gameSituation.playerPositions[1].number, 13); // A. Frei
+              }
             }
           },
           
@@ -167,13 +174,11 @@ vows.describe("fcb api").addBatch( {
             topic: api.get("/fcb/situations"),
             "should return with the situation data": function(err, req, body) {
               assert.isNull(err);
-              for ( var i = 0; i < req.body.list.length; i++ ) {
-                var situation = req.body.list[i];
-                assert.equal("1-0", situation.score);
-                assert.equal("Servette", situation.opponent);
-                assert.equal(false, situation.homematch);
-                assert.equal("m", situation.competition);
-              }
+              var situation = req.body.list[0];
+              assert.equal(situation.score, "1-0");
+              assert.equal("Servette", situation.opponent);
+              assert.equal(false, situation.homematch);
+              assert.equal("m", situation.competition);
             }
           }
         }

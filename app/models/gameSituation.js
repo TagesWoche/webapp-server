@@ -47,6 +47,9 @@ var GameSituation = function(spreadsheetNotation) {
       if ( specialConditionMatches[1].length > 1 && specialConditionMatches[1].slice(0, 2) === "F:" ) {
         playerPosition.specialCondition = "F";
         playerPosition.fouledBy = specialConditionMatches[1].slice(2);
+      } else if ( specialConditionMatches[1].length > 1 && specialConditionMatches[1].slice(0, 2) === "G:" ) {
+        playerPosition.specialCondition = "G";
+        playerPosition.triedToScore = specialConditionMatches[1].slice(2);
       } else {
         playerPosition.specialCondition = specialConditionMatches[1];
       }

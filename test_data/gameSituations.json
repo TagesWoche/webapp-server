@@ -11,6 +11,19 @@
       "scoredByWhatever": "",
       "ownGoal": "",
       "line": 2 },
+    { "date": "2012-07-16T22:00:00.000Z",
+      "opponent": "Flora Tallinn",
+      "team": "FCB",
+      "gameSituation": "Stocker K1(E) -> A. Frei B6(G:OM) -> Streller B7",
+      "scorePosition": "OM",
+      "minute": 1,
+      "scoredByHead": "",
+      "scoredByRightFoot": "x",
+      "scoredByLeftFoot": "",
+      "scoredByWhatever": "",
+      "ownGoal": "",
+      "line": 3
+    },  
     { "date": "2012-01-07T23:00:00.000Z",
       "opponent": "FCZ",
       "team": "FCB",
@@ -22,7 +35,7 @@
       "scoredByLeftFoot": "",
       "scoredByWhatever": "x",
       "ownGoal": "",
-      "line": 3 },
+      "line": 4 },
     { "date": "2012-01-07T23:00:00.000Z",
       "opponent": "FCZ",
       "team": "FCZ",
@@ -34,5 +47,5 @@
       "scoredByLeftFoot": "",
       "scoredByWhatever": "",
       "ownGoal": "",
-      "line": 4 } ] 
+      "line": 5 } ] 
 }
