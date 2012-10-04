@@ -89,6 +89,7 @@ var GameSituation = function(spreadsheetNotation) {
       // the name
       if ( playerPositionParts[1] ) {
         playerPosition.name = playerName;
+        playerPosition.fullname = getFullName(playerPosition.name)
         lastPlayerName = playerPosition.name;
       } else {
         this.parseErrors.push("The situation on line " + ( this.line ) + " has a part without a player name.");
@@ -234,9 +235,15 @@ var GameSituation = function(spreadsheetNotation) {
   
   this.addPlayersData = function(players) {
     _.each( this.playerPositions, function(playerPosition) {
-      var number = players[playerPosition.name];
-      if ( number ) {
-        playerPosition.number = number;
+      if ( players[playerPosition.name] ) {
+        var number = players[playerPosition.name].number;
+        var fullname = players[playerPosition.name].fullname;
+        if ( number ) {
+          playerPosition.number = number;
+        }
+        if ( fullname ) {
+          playerPosition.fullname = fullname;
+        }
       }
     } );
   }
@@ -252,7 +259,7 @@ GameSituation.parseValidateAndSaveSpreadsheet = function(dbHandler, spreadsheetL
     _.each(replies, function(entry) {
       var player = JSON.parse(entry);
       //console.log("loading player: " + player.nickname);
-      players[player.nickname] = player.number;
+      players[player.nickname] = { "number": player.number, "fullname": player.name };
     });
     
     dbHandler.hgetall("Games", function (err, games) {      

@@ -153,34 +153,34 @@ app.get("/testdata/players", function(req, res, next) {
 });
 
 // get all saved situations
-app.get("/fcb/situations", function(req, res, next) {
-  app.redisClient.hgetall("Situations", function(err, replies) {
-    var gameSituationsExternal = {};
-    gameSituationsExternal.list = [];
-    for ( var key in replies) {
-      var gameSituation = JSON.parse(replies[key]);
-      var gameSituationExternal = {};
-      // The interface
-      gameSituationExternal.date =                gameSituation.date;
-      gameSituationExternal.score =               gameSituation.score;
-      gameSituationExternal.team =                gameSituation.team;
-      gameSituationExternal.minute =              gameSituation.minute;
-      gameSituationExternal.opponent =            gameSituation.opponent;
-      gameSituationExternal.homematch =           gameSituation.homematch;
-      gameSituationExternal.competition =         gameSituation.competition;
-      gameSituationExternal.playerPositions =     gameSituation.playerPositions;
-      gameSituationExternal.scorePosition =       gameSituation.scorePosition;
-      gameSituationExternal.scoredByHead =        gameSituation.scoredByHead;
-      gameSituationExternal.scoredByRightFoot =   gameSituation.scoredByRightFoot;
-      gameSituationExternal.scoredByLeftFoot =    gameSituation.scoredByLeftFoot;
-      gameSituationExternal.scoredByWhatever =    gameSituation.scoredByWhatever;
-      gameSituationExternal.ownGoal =             gameSituation.ownGoal;
-                            
-      gameSituationsExternal.list.push(gameSituationExternal);
-    }
-    
-    return res.json( gameSituationsExternal, 200 );
-  });
+app.get("/fcb/situations", function(req, res, next) {    
+    app.redisClient.hgetall("Situations", function(err, replies) {
+      var gameSituationsExternal = {};
+      gameSituationsExternal.list = [];
+      for ( var key in replies) {
+        var gameSituation = JSON.parse(replies[key]);
+        var gameSituationExternal = {};
+        // The interface
+        gameSituationExternal.date =                gameSituation.date;
+        gameSituationExternal.score =               gameSituation.score;
+        gameSituationExternal.team =                gameSituation.team;
+        gameSituationExternal.minute =              gameSituation.minute;
+        gameSituationExternal.opponent =            gameSituation.opponent;
+        gameSituationExternal.homematch =           gameSituation.homematch;
+        gameSituationExternal.competition =         gameSituation.competition;
+        gameSituationExternal.playerPositions =     gameSituation.playerPositions;
+        gameSituationExternal.scorePosition =       gameSituation.scorePosition;
+        gameSituationExternal.scoredByHead =        gameSituation.scoredByHead;
+        gameSituationExternal.scoredByRightFoot =   gameSituation.scoredByRightFoot;
+        gameSituationExternal.scoredByLeftFoot =    gameSituation.scoredByLeftFoot;
+        gameSituationExternal.scoredByWhatever =    gameSituation.scoredByWhatever;
+        gameSituationExternal.ownGoal =             gameSituation.ownGoal;
+
+        gameSituationsExternal.list.push(gameSituationExternal);
+      }
+
+      return res.json( gameSituationsExternal, 200 );
+    });
 });
 
 
