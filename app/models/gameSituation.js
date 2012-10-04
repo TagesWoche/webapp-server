@@ -89,7 +89,6 @@ var GameSituation = function(spreadsheetNotation) {
       // the name
       if ( playerPositionParts[1] ) {
         playerPosition.name = playerName;
-        playerPosition.fullname = getFullName(playerPosition.name)
         lastPlayerName = playerPosition.name;
       } else {
         this.parseErrors.push("The situation on line " + ( this.line ) + " has a part without a player name.");
