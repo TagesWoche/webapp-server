@@ -91,9 +91,9 @@ var matchesGameFilter = function(game, filters) {
   
   // look only for second filter if first filter does not rule out yet
   if ( filters.competition && matchesFilter == true ) {
-    if ( (filter.competition === "m" && game.competition === "m" ) ||
-         (filter.competition === "c" && game.competition === "c") || 
-         (filter.competition === "euro" && (game.competition == "qcl" || game.competition == "el" || game.competition == "cl" || game.competition == "qel")) ){
+    if ( (filters.competition === "m" && game.competition === "m" ) ||
+         (filters.competition === "c" && game.competition === "c") || 
+         (filters.competition === "euro" && (game.competition == "qcl" || game.competition == "el" || game.competition == "cl" || game.competition == "qel")) ){
       matchesFilter = true;
     } else {
       matchesFilter = false;
