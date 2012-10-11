@@ -77,15 +77,30 @@ var addGameAverageGradeToPlayersStatistics = function(gameGrades, gameEntry, pla
 };
 
 var matchesGameFilter = function(game, filters) {
+  var matchesFilter = true; // true by default
+  
+  // look always for first filter
   if ( filters.location ) {
     if ( (filters.location === "home" && game.homematch === true) ||
          (filters.location === "out" && game.homematch === false) ) {
-      return true;
+      matchesFilter = true;
     } else {
-      return false;
+      matchesFilter = false;
     }
   }
-  return true;
+  
+  // look only for second filter if first filter does not rule out yet
+  if ( filters.competition && matchesFilter == true ) {
+    if ( (filter.competition === "m" && game.competition === "m" ) ||
+         (filter.competition === "c" && game.competition === "c") || 
+         (filter.competition === "euro" && (game.competition == "qcl" || game.competition == "el" || game.competition == "cl" || game.competition == "qel")) ){
+      matchesFilter = true;
+    } else {
+      matchesFilter = false;
+    }
+  }
+  
+  return matchesFilter;
 };
 
 var calcAverageGrade = function(grades) {
