@@ -255,6 +255,11 @@ app.get("/fcb/statistics", function(req, res, next) {
         // fill up with 0's for players that were not in the Kader yet
         while ( gamesCount > playerStatistics[key].grades.length ) {
           playerStatistics[key].grades.unshift( { grade: 0, averageGameGrade: 0, opponent: "Noch nicht im Kader" });
+          
+        }
+        
+        // same for scores
+        while ( gamesCount > playerStatistics[key].scores.length ) {
           playerStatistics[key].scores.unshift( { scores: [ 0, 0 ], opponent: "Noch nicht im Kader" });
         }
         
