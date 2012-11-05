@@ -47,7 +47,7 @@ var addGameToPlayersStatistic = function(player, playerStatistics, opponent) {
   playerStatistics[player.name].goals += +player.goals;
   playerStatistics[player.name].assists += +player.assists;
   playerStatistics[player.name].grades.push({ grade: +player.grade, gameAverageGrade: 0, opponent: opponent });
-  playerStatistics[player.name].scores.push({ scores: new Array( +player.goals, +player.assists ), opponent: opponent });
+  playerStatistics[player.name].scores.push({ scores: new Array( +player.assists, +player.goals ), opponent: opponent });
   
 
   if ( player.yellowCard )
