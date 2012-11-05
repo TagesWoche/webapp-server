@@ -27,7 +27,7 @@ vows.describe("fcb api").addBatch( {
       "should have received the players from the redis database": function(err, replies) {
         //console.log(replies);
         assert.isNull(err);
-        assert.equal(27, replies.length);
+        assert.equal(28, replies.length);
       }
     }
   },

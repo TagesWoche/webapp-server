@@ -13,4 +13,4 @@ node.js server für Tageswoche Applikationen
 - Datenimport und Aufbereitung?
 
 ##Connect to redis database
-redis-cli -h barb.redistogo.com -p 9111 -a 93fbe3baf4c48b4ec1b3a4f5522937c8
+redis-cli -h cod.redistogo.com -p 9171 -a 7320eb10e49b55dbc02cff10c01506f5

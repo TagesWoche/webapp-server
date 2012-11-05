@@ -215,6 +215,7 @@ app.get("/fcb/statistics", function(req, res, next) {
       });
       var gamesCount = 0;
       for ( var rawGame in games ) {
+        //var playersNotListed = _.keys(playerStatistics.name); // holds all players that are in the Kader but didn't play in the filter selection
         var gameEntry = JSON.parse(games[rawGame]);   // a game with all players in a collection
         if ( matchesGameFilter(gameEntry, req.query) ) {
           gamesCount += 1;
@@ -222,14 +223,29 @@ app.get("/fcb/statistics", function(req, res, next) {
           for ( var i = 0; i < gameEntry.players.length; i++ ) {
             var player = gameEntry.players[i];        // an entry from the player collection in a game -> one player in one game
             if ( playerStatistics[player.name] ) {    // only do statistics for the current Kader              
+              // add the game to the statistics of this player
               addGameToPlayersStatistic(player, playerStatistics, gameEntry.opponent);
               
+              // add to grades
               if ( +player.grade > 0 ) {
                 gameGrades.push(+player.grade);
               }
-            }  
+              
+              // remove the player from the list of players that get an empty entry for this game
+              //var idx = playersNotListed.find(player.name);
+              //if ( idx != -1 ) visibleIds.splice(idx, 1);
+              
+            } // TODO if player is not listed it should add an empty entry  
           }
           
+          // TODO fill in empty records for player in the kader that didn't play
+          /*
+          for ( var i = 0; i < playersNotListed; i++ ) {
+            
+          }
+          */
+          
+          // average calculation
           addGameAverageGradeToPlayersStatistics(gameGrades, gameEntry, playerStatistics);
         }
       }
@@ -238,7 +254,8 @@ app.get("/fcb/statistics", function(req, res, next) {
       for ( var key in playerStatistics ) {
         // fill up with 0's for players that were not in the Kader yet
         while ( gamesCount > playerStatistics[key].grades.length ) {
-          playerStatistics[key].grades.unshift( { grade: 0, averageGameGrade: 0, opponent: "Noch nicht im Kader" })
+          playerStatistics[key].grades.unshift( { grade: 0, averageGameGrade: 0, opponent: "Noch nicht im Kader" });
+          playerStatistics[key].scores.unshift( { scores: [ 0, 0 ], opponent: "Noch nicht im Kader" });
         }
         
         playerStatistics[key].averageGrade = calcAverageGrade(playerStatistics[key].grades);
