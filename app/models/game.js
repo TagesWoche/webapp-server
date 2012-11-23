@@ -42,8 +42,12 @@ var Game = function(spreadsheetNotation) {
     }
     
     var timeForAllPlayers = maxTime * 11;
+    
+    /* TODO: disable check if there was a red card */
+    /*
     if ( timeForAllPlayers !== playedTime )
       this.validationErrors.push("The game played by all players does not add up to the total time. Check minutes played. The total amount of minutes played by all players (11 times time of the game) is " + timeForAllPlayers + " but the time recorded is " + playedTime);    
+    */
   };
 
   var validateCompetition = function() {
@@ -116,7 +120,7 @@ var Game = function(spreadsheetNotation) {
   this.validate = function(players) {
     // NOTE: -> the team can change. unless we only validate the last game this is not working
     // validateCompleteTeam.call(this, players); 
-    validateTimePlayed.call(this);
+    /*validateTimePlayed.call(this);*/
     validateCompetition.call(this);
   };
 };
