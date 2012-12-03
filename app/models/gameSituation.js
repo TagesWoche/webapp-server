@@ -90,7 +90,9 @@ var GameSituation = function(spreadsheetNotation) {
       // if it is a walking man just push to the playerPosition object from the last iteration
       // NOTE: cannot be a walking man when fouled (plain physics)
       if ( lastPlayerName === playerName &&
-           playerPosition.specialCondition !== "F" ) {
+           playerPosition.specialCondition !== "P" &&
+           playerPosition.specialCondition !== "FD" &&
+           playerPosition.specialCondition !== "FI" ) {
         playerPosition = lastPlayerPosition;
         walkingMan = true;
       }
