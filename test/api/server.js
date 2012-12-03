@@ -149,7 +149,7 @@ vows.describe("fcb api").addBatch( {
           "should get the games from redis": function(err, replies) {
             assert.isNull(err);
             //console.log(_.keys(replies).length);
-            assert.equal(_.keys(replies).length, 2);
+            assert.equal(_.keys(replies).length, 3);
             
             var key, value;
             for (key in replies) {
@@ -167,6 +167,13 @@ vows.describe("fcb api").addBatch( {
                 assert.equal(gameSituation.playerPositions[1].triedToScore, "OM");
                 assert.equal(gameSituation.playerPositions[1].number, 13); // A. Frei
               }
+              // situation .. has a Penalty
+              if ( key == 5 ) {
+                assert.equal(gameSituation.playerPositions.length, 3);
+                assert.equal(gameSituation.playerPositions[2].specialCondition, "P");
+                assert.equal(gameSituation.playerPositions[1].specialCondition, "F");
+              }
+              
             }
           },
           

@@ -43,6 +43,7 @@ var GameSituation = function(spreadsheetNotation) {
   var parseSpecialCondition = function(specialCondition, playerPosition) {
     var specialConditionPattern = new RegExp(/\((.*)\)/);
     var specialConditionMatches = specialConditionPattern.exec(specialCondition);
+    //console.log(specialConditionMatches);
     if ( specialConditionMatches[1] ) {
       if ( specialConditionMatches[1].length > 1 && specialConditionMatches[1].slice(0, 2) === "F:" ) {
         playerPosition.specialCondition = "F";
@@ -83,6 +84,7 @@ var GameSituation = function(spreadsheetNotation) {
       
       // NOTE: do the special conditions first so you can use them for the walking man test
       // the special condition: optional
+      // => if it is a walking man this step needs to be repeated later in the iteration (see below)
       if ( playerPositionParts[3] ) {
         parseSpecialCondition(playerPositionParts[3], playerPosition);
       }
@@ -113,6 +115,13 @@ var GameSituation = function(spreadsheetNotation) {
         playerPosition.positions.push(playerPositionParts[2]);
       } else {
         this.parseErrors.push("The situation on line " + ( this.line ) + " has a part without a player position.");
+      }
+      
+      // NOTE: need to do this again in case of a walking man since playerPosition object changed
+      if ( walkingMan === true ) {
+        if ( playerPositionParts[3] ) {
+          parseSpecialCondition(playerPositionParts[3], playerPosition);
+        }
       }
       
       lastPlayerPosition = playerPosition;
