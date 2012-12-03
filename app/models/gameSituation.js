@@ -81,7 +81,16 @@ var GameSituation = function(spreadsheetNotation) {
       
       var playerName = playerPositionParts[1].trim();
       
-      if ( lastPlayerName === playerName ) {
+      // NOTE: do the special conditions first so you can use them for the walking man test
+      // the special condition: optional
+      if ( playerPositionParts[3] ) {
+        parseSpecialCondition(playerPositionParts[3], playerPosition);
+      }
+      
+      // if it is a walking man just push to the playerPosition object from the last iteration
+      // NOTE: cannot be a walking man when fouled (plain physics)
+      if ( lastPlayerName === playerName &&
+           playerPosition.specialCondition !== "F" ) {
         playerPosition = lastPlayerPosition;
         walkingMan = true;
       }
@@ -102,11 +111,6 @@ var GameSituation = function(spreadsheetNotation) {
         playerPosition.positions.push(playerPositionParts[2]);
       } else {
         this.parseErrors.push("The situation on line " + ( this.line ) + " has a part without a player position.");
-      }
-
-      // the special condition: optional
-      if ( playerPositionParts[3] ) {
-        parseSpecialCondition(playerPositionParts[3], playerPosition);
       }
       
       lastPlayerPosition = playerPosition;
