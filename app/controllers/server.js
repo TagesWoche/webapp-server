@@ -203,7 +203,7 @@ app.get("/fcb/situations", function(req, res, next) {
 app.get("/fcb/statistics", function(req, res, next) {
   app.redisClient.hgetall("FCB", function(err, players) {
     // construct player data
-    playerStatistics = {};
+    var playerStatistics = {};
     for ( var rawPlayer in players ) {
       var player = JSON.parse(players[rawPlayer]);
       playerStatistics[player.name] = initStatistics(player);
