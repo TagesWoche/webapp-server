@@ -1,12 +1,12 @@
-var test = require("../setup"), 
+var test = require("../setup"),
     Game = require("../../app/models/game"),
-    vows = test.vows, assert = test.assert, api = test.api, 
+    vows = test.vows, assert = test.assert, api = test.api,
     redis = require("redis"),
     _ = require('underscore')._,
     fs = require("fs"),
     redisClient = redis.createClient(),
     controller = require("../../app/controllers/server"),
-    spawn = require('child_process').spawn;        
+    spawn = require('child_process').spawn;
 
 
 vows.describe("fcb api").addBatch( {
@@ -16,7 +16,7 @@ vows.describe("fcb api").addBatch( {
       api.postData("/fcb/players", "players", this.callback)();
     },
     "should return status code 200": api.assertStatus(200),
-    
+
     "-> get the players from the redis database": {
       topic: function() {
         var cb = this.callback;
@@ -31,29 +31,29 @@ vows.describe("fcb api").addBatch( {
       }
     }
   },
-  
+
   teardown: function() {
     redisClient.del("FCB");
     redisClient.del("Games");
     redisClient.del("Situations");
   }
-  
-}).addBatch( { 
+
+}).addBatch( {
    // games (players are needed for setup)
-    
+
   "post the players": {
     topic: function() {
       api.postData("/fcb/players", "players", this.callback)();
     },
-    
+
     "should return status code 200": api.assertStatus(200),
-    
+
     "-> post a game description": {
       topic: function() {
         api.postData("/fcb/games", "games", this.callback)();
       },
       "should return status code 200": api.assertStatus(200),
-      
+
       "--> get the game description from redis": {
         topic: function() {
           var cb = this.callback;
@@ -63,9 +63,9 @@ vows.describe("fcb api").addBatch( {
         },
         "should get the games from redis": function(err, replies) {
           assert.isNull(err);
-          assert.equal(replies.length, 8);
+          assert.equal(replies.length, 9);
         },
-        
+
         "---> get the player statistics from GET route": {
           topic: api.get("/fcb/statistics"),
           "should get players with statistics": function(err, req, body) {
@@ -77,12 +77,12 @@ vows.describe("fcb api").addBatch( {
             assert.equal(req.body.list[10].name, "Markus Steinhöfer");
             assert.equal(req.body.list[25].name, "Jacques Zoua Daogari");
             assert.equal(req.body.list[4].name, "Philipp Degen");
-            
-            assert.equal(req.body.list[0].minutes, 655);     
+
+            assert.equal(req.body.list[0].minutes, 655);
             assert.equal(req.body.list[23].goals, 4);
             assert.equal(req.body.list[23].played, 5);
-            assert.equal(req.body.list[10].assists, 2);    
-            assert.equal(req.body.list[25].averageGrade, (3.5+5+3+5)/4);   
+            assert.equal(req.body.list[10].assists, 2);
+            assert.equal(req.body.list[25].averageGrade, (3.5+5+3+5)/4);
             assert.equal(req.body.list[25].played, 8);
             assert.equal(req.body.list[4].yellowCards, 1);
             assert.equal(req.body.list[17].grades.length, 8);
@@ -96,49 +96,56 @@ vows.describe("fcb api").addBatch( {
             assert.deepEqual(req.body.list[0].grades[5].gameAverageGrade, 4.541666666666667);
             assert.deepEqual(req.body.list[0].grades[6].grade, 5);
             assert.deepEqual(req.body.list[0].grades[7].grade, 5);
-            
+
             //assert.deepEqual(req.body.list[0].grades, [{ grade: 4.5 }, { grade: 0 }, { grade: 6, gameAverageGrade: 3.9545454545454546 }, { grade: 0 }, { grade: 5.5 }, { grade: 4.5, gameAverageGrade: 4.541666666666667 }, { grade: 5 }, { grade: 5 }]);
           },
-          
+
           "----> get the player statistics only for home plays": {
             topic: api.get("/fcb/statistics?location=home"),
             "should get the player statistics for home plays": function(err, req, body) {
               assert.isNull(err);
               assert.equal(req.body.list[12].minutes, 249); // David Degen
             }
-          }
+          },
+            "----> get the player statistics only for saison 12/13": {
+            topic: api.get("/fcb/statistics?saison=13/14"),
+            "should get the player statistics for saison 12/13": function(err, req, body) {
+              assert.isNull(err);
+              assert.equal(req.body.list[12].minutes, 10); // David Degen
+            }
+          },
         }
       }
-    }  
+    }
   },
-  
+
   teardown: function() {
     redisClient.del("FCB");
     redisClient.del("Games");
     redisClient.del("Situations");
   }
-    
+
 }).addBatch( {
   // scenes
   "post the players": {
     topic: function() {
       api.postData("/fcb/players", "players", this.callback)();
     },
-    
+
     "should return status code 200": api.assertStatus(200),
-    
+
     "-> post a game description": {
       topic: function() {
         api.postData("/fcb/games", "games", this.callback)();
       },
       "should return status code 200": api.assertStatus(200),
-    
+
       "--> post the scenes description": {
         topic: function() {
           api.postData("/fcb/situations", "gameSituations", this.callback)();
         },
         "should return status code 200": api.assertStatus(200),
-      
+
         "---> get the scene description from redis": {
           topic: function() {
             var cb = this.callback;
@@ -150,7 +157,7 @@ vows.describe("fcb api").addBatch( {
             assert.isNull(err);
             //console.log(_.keys(replies).length);
             assert.equal(_.keys(replies).length, 3);
-            
+
             var key, value;
             for (key in replies) {
               var gameSituation = JSON.parse(replies[key]);
@@ -173,10 +180,10 @@ vows.describe("fcb api").addBatch( {
                 assert.equal(gameSituation.playerPositions[2].specialCondition, "P");
                 assert.equal(gameSituation.playerPositions[1].specialCondition, "F");
               }
-              
+
             }
           },
-          
+
           "---> get the scene descriptions from GET route": {
             topic: api.get("/fcb/situations"),
             "should return with the situation data": function(err, req, body) {
@@ -189,14 +196,14 @@ vows.describe("fcb api").addBatch( {
             }
           }
         }
-      }  
+      }
     }
   },
-  
+
   teardown: function() {
     redisClient.del("FCB");
     redisClient.del("Games");
     redisClient.del("Situations");
   }
-  
+
 }).export(module);
