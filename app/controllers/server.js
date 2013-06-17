@@ -20,6 +20,7 @@ var logIncoming = function(req, res, next) {
 // H E L P E R S
 //-----------------------------------------------------------------------------
 var saisons = {
+  'all': [new Date(2011, 06, 01), new Date(2099, 05, 30)], // 1. Jul 2011 - 30. Jun 2099
   '12/13': [new Date(2012, 06, 01), new Date(2013, 05, 30)], // 1. Jul 2012 - 30. Jun 2013
   '13/14': [new Date(2013, 06, 01), new Date(2014, 05, 30)]  // 1. Jul 2013 - 20. Jun 2014
 };
@@ -217,7 +218,7 @@ app.get("/fcb/situations", function(req, res, next) {
 
 app.get("/fcb/statistics", function(req, res, next) {
   // saison filter
-  var currentSaison = saisons['12/13']; // default value
+  var currentSaison = saisons['13/14']; // default value
   if ( req.query.saison ) {
     currentSaison = saisons[req.query.saison];
   }
