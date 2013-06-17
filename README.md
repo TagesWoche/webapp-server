@@ -14,9 +14,19 @@ Data includes
 
 See the spreadsheet: https://docs.google.com/a/tageswoche.ch/spreadsheet/ccc?key=0At91HUqcYc5RdDVRaVhmY1RZemlWcXNFa2l0NzhsakE#gid=0
 
-###Politics
+####Development Setup
 
--- documentation to follow --
+Requirements:
 
-###Connect to redis database
-redis-cli -h cod.redistogo.com -p 9171 -a 7320eb10e49b55dbc02cff10c01506f5
+ - node.js
+ - redis
+
+Setup:
+
+    $ npm install (to install dependencies)
+    $ redis-server (for the redis connection)
+    $ nodemon bin/server (run this from the root of the project)
+
+Run all Tests:
+
+    $ vows test/**/*
