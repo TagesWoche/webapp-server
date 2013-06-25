@@ -14,6 +14,8 @@ Data includes
 
 See the spreadsheet: https://docs.google.com/a/tageswoche.ch/spreadsheet/ccc?key=0At91HUqcYc5RdDVRaVhmY1RZemlWcXNFa2l0NzhsakE#gid=0
 
+If you build an application based on this data, please credit TagesWoche with a link to rotblaulive.ch and drop us a note. 
+
 ###Politics
 
 -- documentation to follow --
