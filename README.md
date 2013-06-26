@@ -14,7 +14,10 @@ Data includes
 
 See the spreadsheet: https://docs.google.com/a/tageswoche.ch/spreadsheet/ccc?key=0At91HUqcYc5RdDVRaVhmY1RZemlWcXNFa2l0NzhsakE#gid=0
 
+We will create a real documentation of the API later, if you have any questions, feel free to ask david.bauer@tageswoche.ch or Gabriel and Lukas from Upfront.io, who created the API for TagesWoche.
+
 If you build an application based on this data, please credit TagesWoche with a link to rotblaulive.ch and drop us a note. 
+
 
 ###Politics
 
