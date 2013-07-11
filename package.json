@@ -14,7 +14,8 @@
     "redis-url": "0.1.0",
     "redis": "0.7.x",
     "hiredis": "0.1.x",
-    "underscore": "*"
+    "underscore": "*",
+    "xtend": "*"
   },
   "devDependencies": {
     "vows": "*",

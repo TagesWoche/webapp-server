@@ -218,7 +218,7 @@ app.get("/fcb/situations", function(req, res, next) {
 
 app.get("/fcb/statistics", function(req, res, next) {
   // saison filter
-  var currentSaison = saisons['13/14']; // default value
+  var currentSaison = saisons[global.conf.saison]; // default value
   if ( req.query.saison ) {
     currentSaison = saisons[req.query.saison];
   }
