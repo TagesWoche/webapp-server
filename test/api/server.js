@@ -107,11 +107,25 @@ vows.describe("fcb api").addBatch( {
               assert.equal(req.body.list[12].minutes, 249); // David Degen
             }
           },
-            "----> get the player statistics only for saison 12/13": {
+          "----> get the player statistics only for saison 12/13": {
             topic: api.get("/fcb/statistics?saison=13/14"),
             "should get the player statistics for saison 12/13": function(err, req, body) {
               assert.isNull(err);
               assert.equal(req.body.list[12].minutes, 10); // David Degen
+            }
+          },
+          "----> get the default saison": {
+            topic: api.get("/fcb/statistics"),
+            "should get the default saison": function(err, req, body) {
+              assert.isNull(err);
+              assert.equal("12/13", req.body.season);
+            }
+          },
+          "----> get the requested saison": {
+            topic: api.get("/fcb/statistics?saison=13/14"),
+            "should get the requested saison": function(err, req, body) {
+              assert.isNull(err);
+              assert.equal("13/14", req.body.season);
             }
           },
         }

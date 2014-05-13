@@ -218,10 +218,8 @@ app.get("/fcb/situations", function(req, res, next) {
 
 app.get("/fcb/statistics", function(req, res, next) {
   // saison filter
-  var currentSaison = saisons[global.conf.saison]; // default value
-  if ( req.query.saison ) {
-    currentSaison = saisons[req.query.saison];
-  }
+  var currentSaisonKey = req.query.saison || global.conf.saison;
+  var currentSaison = saisons[currentSaisonKey];
 
   app.redisClient.hgetall("FCB", function(err, players) {
     // construct player data
@@ -293,7 +291,7 @@ app.get("/fcb/statistics", function(req, res, next) {
         return player.order;
       });
 
-      return res.json( { list: playerStatisticsList }, 200 );
+      return res.json( { season: currentSaisonKey, list: playerStatisticsList }, 200 );
     });
   });
 });
