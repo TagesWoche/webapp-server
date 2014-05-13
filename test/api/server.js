@@ -2,11 +2,13 @@ var test = require("../setup"),
     Game = require("../../app/models/game"),
     vows = test.vows, assert = test.assert, api = test.api,
     redis = require("redis"),
+    sinon = require("sinon"),
     _ = require('underscore')._,
     fs = require("fs"),
     redisClient = redis.createClient(),
     controller = require("../../app/controllers/server"),
-    spawn = require('child_process').spawn;
+    spawn = require('child_process').spawn,
+    clock;
 
 
 vows.describe("fcb api").addBatch( {
@@ -36,7 +38,12 @@ vows.describe("fcb api").addBatch( {
     redisClient.del("FCB");
     redisClient.del("Games");
     redisClient.del("Situations");
-  }
+    clock.restore();
+  },
+
+  setup: function() {
+    clock = sinon.useFakeTimers();
+  },
 
 }).addBatch( {
    // games (players are needed for setup)
@@ -107,11 +114,32 @@ vows.describe("fcb api").addBatch( {
               assert.equal(req.body.list[12].minutes, 249); // David Degen
             }
           },
-            "----> get the player statistics only for saison 12/13": {
+          "----> get the player statistics only for saison 12/13": {
             topic: api.get("/fcb/statistics?saison=13/14"),
             "should get the player statistics for saison 12/13": function(err, req, body) {
               assert.isNull(err);
               assert.equal(req.body.list[12].minutes, 10); // David Degen
+            }
+          },
+          "----> get the default saison": {
+            topic: api.get("/fcb/statistics"),
+            "should get the default saison": function(err, req, body) {
+              assert.isNull(err);
+              assert.equal("12/13", req.body.season);
+            }
+          },
+          "----> get the requested saison": {
+            topic: api.get("/fcb/statistics?saison=13/14"),
+            "should get the requested saison": function(err, req, body) {
+              assert.isNull(err);
+              assert.equal("13/14", req.body.season);
+            }
+          },
+          "----> get a last update timestamp": {
+            topic: api.get("/fcb/statistics"),
+            "should get the time of last update": function(err, req, body) {
+              assert.isNull(err);
+              assert.equal((new Date()).toString(), req.body.lastUpdate); // uses sinon faketimers
             }
           },
         }

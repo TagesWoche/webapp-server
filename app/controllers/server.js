@@ -218,84 +218,85 @@ app.get("/fcb/situations", function(req, res, next) {
 
 app.get("/fcb/statistics", function(req, res, next) {
   // saison filter
-  var currentSaison = saisons[global.conf.saison]; // default value
-  if ( req.query.saison ) {
-    currentSaison = saisons[req.query.saison];
-  }
+  var currentSaisonKey = req.query.saison || global.conf.saison;
+  var currentSaison = saisons[currentSaisonKey];
 
-  app.redisClient.hgetall("FCB", function(err, players) {
-    // construct player data
-    var playerStatistics = {};
-    for ( var rawPlayer in players ) {
-      var player = JSON.parse(players[rawPlayer]);
-      playerStatistics[player.name] = initStatistics(player);
-    }
-
-    app.redisClient.hgetall("Games", function(err, games) {
-      games = _.sortBy(games, function(game){
-        return game;
-      });
-      var gamesCount = 0;
-      for ( var rawGame in games ) {
-        //var playersNotListed = _.keys(playerStatistics.name); // holds all players that are in the Kader but didn't play in the filter selection
-        var gameEntry = JSON.parse(games[rawGame]);   // a game with all players in a collection
-        if ( matchesSaison(currentSaison, gameEntry) && matchesGameFilter(gameEntry, req.query) ) {
-          gamesCount += 1;
-          var gameGrades = [];
-          for ( var i = 0; i < gameEntry.players.length; i++ ) {
-            var player = gameEntry.players[i];        // an entry from the player collection in a game -> one player in one game
-            if ( playerStatistics[player.name] ) {    // only do statistics for the current Kader
-              // add the game to the statistics of this player
-              addGameToPlayersStatistic(player, playerStatistics, gameEntry.opponent, gameEntry.date);
-
-              // add to grades
-              if ( +player.grade > 0 ) {
-                gameGrades.push(+player.grade);
-              }
-
-              // remove the player from the list of players that get an empty entry for this game
-              //var idx = playersNotListed.find(player.name);
-              //if ( idx != -1 ) visibleIds.splice(idx, 1);
-
-            } // TODO if player is not listed it should add an empty entry
-          }
-
-          // TODO fill in empty records for player in the kader that didn't play
-          /*
-          for ( var i = 0; i < playersNotListed; i++ ) {
-
-          }
-          */
-
-          // average calculation
-          addGameAverageGradeToPlayersStatistics(gameGrades, gameEntry, playerStatistics);
-        }
+  app.redisClient.get('lastStatisticsUpdate', function(err, lastUpdate) {
+    app.redisClient.hgetall("FCB", function(err, players) {
+      // construct player data
+      var playerStatistics = {};
+      for ( var rawPlayer in players ) {
+        var player = JSON.parse(players[rawPlayer]);
+        playerStatistics[player.name] = initStatistics(player);
       }
 
-      // calc the average grade and package into array
-      for ( var key in playerStatistics ) {
-        // fill up with 0's for players that were not in the Kader yet
-        while ( gamesCount > playerStatistics[key].grades.length ) {
-          playerStatistics[key].grades.unshift( { grade: 0, averageGameGrade: 0, opponent: "Noch nicht im Kader" });
+      app.redisClient.hgetall("Games", function(err, games) {
+        games = _.sortBy(games, function(game){
+          return game;
+        });
+        var gamesCount = 0;
+        for ( var rawGame in games ) {
+          //var playersNotListed = _.keys(playerStatistics.name); // holds all players that are in the Kader but didn't play in the filter selection
+          var gameEntry = JSON.parse(games[rawGame]);   // a game with all players in a collection
+          if ( matchesSaison(currentSaison, gameEntry) && matchesGameFilter(gameEntry, req.query) ) {
+            gamesCount += 1;
+            var gameGrades = [];
+            for ( var i = 0; i < gameEntry.players.length; i++ ) {
+              var player = gameEntry.players[i];        // an entry from the player collection in a game -> one player in one game
+              if ( playerStatistics[player.name] ) {    // only do statistics for the current Kader
+                // add the game to the statistics of this player
+                addGameToPlayersStatistic(player, playerStatistics, gameEntry.opponent, gameEntry.date);
 
+                // add to grades
+                if ( +player.grade > 0 ) {
+                  gameGrades.push(+player.grade);
+                }
+
+                // remove the player from the list of players that get an empty entry for this game
+                //var idx = playersNotListed.find(player.name);
+                //if ( idx != -1 ) visibleIds.splice(idx, 1);
+
+              } // TODO if player is not listed it should add an empty entry
+            }
+
+            // TODO fill in empty records for player in the kader that didn't play
+            /*
+            for ( var i = 0; i < playersNotListed; i++ ) {
+
+            }
+            */
+
+            // average calculation
+            addGameAverageGradeToPlayersStatistics(gameGrades, gameEntry, playerStatistics);
+          }
         }
 
-        // same for scores
-        while ( gamesCount > playerStatistics[key].scores.length ) {
-          playerStatistics[key].scores.unshift( { scores: [ 0, 0 ], opponent: "Noch nicht im Kader" });
+        // calc the average grade and package into array
+        for ( var key in playerStatistics ) {
+          // fill up with 0's for players that were not in the Kader yet
+          while ( gamesCount > playerStatistics[key].grades.length ) {
+            playerStatistics[key].grades.unshift( { grade: 0, averageGameGrade: 0, opponent: "Noch nicht im Kader" });
+
+          }
+
+          // same for scores
+          while ( gamesCount > playerStatistics[key].scores.length ) {
+            playerStatistics[key].scores.unshift( { scores: [ 0, 0 ], opponent: "Noch nicht im Kader" });
+          }
+
+          playerStatistics[key].averageGrade = calcAverageGrade(playerStatistics[key].grades);
         }
 
-        playerStatistics[key].averageGrade = calcAverageGrade(playerStatistics[key].grades);
-      }
+        // sort by the order
+        var playerStatisticsList = _.sortBy(playerStatistics, function(player) {
+          return player.order;
+        });
 
-      // sort by the order
-      var playerStatisticsList = _.sortBy(playerStatistics, function(player) {
-        return player.order;
+        return res.json( { season: currentSaisonKey, list: playerStatisticsList, lastUpdate: lastUpdate }, 200 );
       });
-
-      return res.json( { list: playerStatisticsList }, 200 );
     });
   });
+
 });
 
 // updates the games
