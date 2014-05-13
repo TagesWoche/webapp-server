@@ -8,7 +8,8 @@ var test = require("../setup"),
     redisClient = redis.createClient(),
     controller = require("../../app/controllers/server"),
     spawn = require('child_process').spawn,
-    clock;
+    clock,
+    mockDate;
 
 
 vows.describe("fcb api").addBatch( {
@@ -41,7 +42,8 @@ vows.describe("fcb api").addBatch( {
   },
 
   setup: function() {
-    clock = sinon.useFakeTimers();
+    mockDate = new Date();
+    clock = sinon.useFakeTimers(mockDate.getTime());
   },
 
 }).addBatch( {
@@ -145,7 +147,7 @@ vows.describe("fcb api").addBatch( {
             topic: api.get("/fcb/statistics"),
             "should get the time of last update": function(err, req, body) {
               assert.isNull(err);
-              assert.equal((new Date()).toString(), req.body.lastUpdate); // uses sinon faketimers
+              assert.equal(mockDate.toString(), req.body.lastUpdate); // uses sinon faketimers
             }
           },
         }
