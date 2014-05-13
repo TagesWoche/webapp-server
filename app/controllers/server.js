@@ -271,6 +271,13 @@ app.get("/fcb/statistics", function(req, res, next) {
           }
         }
 
+        // filter players with 0 minutes
+        for ( var key in playerStatistics ) {
+          if ( playerStatistics[key] && playerStatistics[key]["minutes"] == 0 ) {
+            delete playerStatistics[key];
+          }
+        }
+
         // calc the average grade and package into array
         for ( var key in playerStatistics ) {
           // fill up with 0's for players that were not in the Kader yet

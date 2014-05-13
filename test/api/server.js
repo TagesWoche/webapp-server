@@ -27,7 +27,6 @@ vows.describe("fcb api").addBatch( {
         });
       },
       "should have received the players from the redis database": function(err, replies) {
-        //console.log(replies);
         assert.isNull(err);
         assert.equal(28, replies.length);
       }
@@ -77,22 +76,22 @@ vows.describe("fcb api").addBatch( {
           topic: api.get("/fcb/statistics"),
           "should get players with statistics": function(err, req, body) {
             assert.isNull(err);
-            //console.log(req.body);
             assert.equal(req.body.list[0].name, "Yann Sommer");
             assert.equal(req.body.list[0].position, "TW");
-            assert.equal(req.body.list[23].name, "Alexander Frei");
-            assert.equal(req.body.list[10].name, "Markus Steinhöfer");
-            assert.equal(req.body.list[25].name, "Jacques Zoua Daogari");
-            assert.equal(req.body.list[4].name, "Philipp Degen");
+            assert.equal(req.body.list[20].name, "Alexander Frei");
+            assert.equal(req.body.list[7].name, "Markus Steinhöfer");
+            assert.equal(req.body.list[22].name, "Jacques Zoua Daogari");
+            assert.equal(req.body.list[3].name, "Philipp Degen");
 
-            assert.equal(req.body.list[0].minutes, 655);
-            assert.equal(req.body.list[23].goals, 4);
-            assert.equal(req.body.list[23].played, 5);
-            assert.equal(req.body.list[10].assists, 2);
-            assert.equal(req.body.list[25].averageGrade, (3.5+5+3+5)/4);
-            assert.equal(req.body.list[25].played, 8);
-            assert.equal(req.body.list[4].yellowCards, 1);
-            assert.equal(req.body.list[17].grades.length, 8);
+            assert.equal(req.body.list[0].minutes, 655); // Yann Sommer
+            assert.equal(req.body.list[20].goals, 4); // Alex Frei
+            assert.equal(req.body.list[20].played, 5); // Alex Frei
+            assert.equal(req.body.list[7].assists, 2); // Markus Steinhöfer
+            assert.equal(req.body.list[22].averageGrade, (3.5+5+3+5)/4); // Jacques Zoua Daogari
+            assert.equal(req.body.list[22].played, 8); // Jacques Zoua Daogari
+            assert.equal(req.body.list[3].yellowCards, 1); // Philipp Degen
+
+            assert.equal(req.body.list[15].grades.length, 8);
             assert.deepEqual(req.body.list[0].grades[0].grade, 4.5);
             assert.deepEqual(req.body.list[0].grades[1].grade, 0);
             assert.deepEqual(req.body.list[0].grades[2].grade, 6);
@@ -107,18 +106,25 @@ vows.describe("fcb api").addBatch( {
             //assert.deepEqual(req.body.list[0].grades, [{ grade: 4.5 }, { grade: 0 }, { grade: 6, gameAverageGrade: 3.9545454545454546 }, { grade: 0 }, { grade: 5.5 }, { grade: 4.5, gameAverageGrade: 4.541666666666667 }, { grade: 5 }, { grade: 5 }]);
           },
 
+          "----> filter players with 0 minutes played": {
+            topic: api.get("/fcb/statistics"),
+            "should filter 5 players that did not play": function(err, req, body) {
+              assert.isNull(err);
+              assert.equal(23, req.body.list.length);
+            }
+          },
           "----> get the player statistics only for home plays": {
             topic: api.get("/fcb/statistics?location=home"),
             "should get the player statistics for home plays": function(err, req, body) {
               assert.isNull(err);
-              assert.equal(req.body.list[12].minutes, 249); // David Degen
+              assert.equal(req.body.list[9].minutes, 249); // David Degen
             }
           },
           "----> get the player statistics only for saison 12/13": {
             topic: api.get("/fcb/statistics?saison=13/14"),
             "should get the player statistics for saison 12/13": function(err, req, body) {
               assert.isNull(err);
-              assert.equal(req.body.list[12].minutes, 10); // David Degen
+              assert.equal(req.body.list[0].minutes, 10); // David Degen
             }
           },
           "----> get the default saison": {
@@ -183,7 +189,6 @@ vows.describe("fcb api").addBatch( {
           },
           "should get the games from redis": function(err, replies) {
             assert.isNull(err);
-            //console.log(_.keys(replies).length);
             assert.equal(_.keys(replies).length, 3);
 
             var key, value;
