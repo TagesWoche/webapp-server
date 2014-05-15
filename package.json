@@ -19,6 +19,7 @@
   },
   "devDependencies": {
     "vows": "*",
-    "request": "*"
+    "request": "*",
+    "sinon": "*"
   }
 }
