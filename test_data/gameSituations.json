@@ -2,7 +2,7 @@
   [ { "date": "2012-07-12T22:00:00.000Z",
       "opponent": "Servette",
       "team": "FCB",
-      "gameSituation": "Stocker K1 -> Park N1 -> Park P2 -> Streller N3 -> Streller R4 -> D. Degen P5",
+      "gameSituation": "Stocker K1 -> Park N1 -> Park P2 -> M. Gavranovic P1 (Gegenspieler) -> Streller N3 -> Streller R4 -> D. Degen P5",
       "scorePosition": "OM",
       "minute": 59,
       "scoredByHead": "",
@@ -22,7 +22,7 @@
       "scoredByLeftFoot": "",
       "scoredByWhatever": "",
       "ownGoal": "",
-      "line": 3 },  
+      "line": 3 },
     { "date": "2012-07-16T22:00:00.000Z",
       "opponent": "Flora Tallinn",
       "team": "FCB",
@@ -34,6 +34,6 @@
       "scoredByLeftFoot": "",
       "scoredByWhatever": "",
       "ownGoal": "",
-      "line": 4 } 
+      "line": 4 }
   ]
 }

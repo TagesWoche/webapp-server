@@ -198,7 +198,7 @@ vows.describe("fcb api").addBatch( {
               var gameSituation = JSON.parse(replies[key]);
               // situation 3 has a walking man
               if ( key == 3 ) {
-                assert.equal(4, gameSituation.playerPositions.length);
+                assert.equal(5, gameSituation.playerPositions.length);
                 assert.equal(2, gameSituation.playerPositions[1].positions.length);
                 assert.equal(3, gameSituation.playerPositions[1].number); // Park
               }

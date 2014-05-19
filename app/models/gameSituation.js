@@ -29,7 +29,7 @@ var GameSituation = function(spreadsheetNotation) {
   this.playerPositions = [];  // TODO: maybe put this into its own object
   this.playerPositionPartsPattern = new RegExp(/(\w{1}.\s*[A-Z,a-z,ö,ä,ü,é,è,ê]+)\s*([A-Z]\d{1,2})\s*(\(.*\))?/);
   this.positionPattern = new RegExp(/[A-R]\d{1,2}/);
-  this.specialConditionsPattern = new RegExp(/\((FD|FI|E|P|PS|EW|F:\s*.*)\)/);
+  this.specialConditionsPattern = new RegExp(/\((Gegenspieler|FD|FI|E|P|PS|EW|F:\s*.*)\)/);
 
   // class variables
   var maxTime = 125; // 120 min + 5 min overtime
@@ -168,8 +168,8 @@ var GameSituation = function(spreadsheetNotation) {
   };
 
 
-  var shouldValidatePlayerName = function(name) {
-    if (name.indexOf('Gegenspieler:') == 0) {
+  var shouldValidatePlayerName = function(specialCondition) {
+    if (specialCondition == 'Gegenspieler') {
       return false;
     } else {
       return true;
@@ -180,7 +180,7 @@ var GameSituation = function(spreadsheetNotation) {
     if ( this.team.toLowerCase() == "fcb" ) {
       for ( var i = 0; i < this.playerPositions.length; i++ ) {
         // the name
-        if (shouldValidatePlayerName(this.playerPositions[i].name)) {
+        if (shouldValidatePlayerName(this.playerPositions[i].specialCondition)) {
           if ( !players[this.playerPositions[i].name] ) {
             this.validationErrors.push("The name " + this.playerPositions[i].name + " on line " + ( this.line ) + " is not a valid player name. Check the correct nicknames.");
           }
