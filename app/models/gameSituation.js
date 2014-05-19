@@ -169,7 +169,7 @@ var GameSituation = function(spreadsheetNotation) {
 
 
   var shouldValidatePlayerName = function(name) {
-    if (name.substring(0, 13) == 'Gegenspieler:') {
+    if (name.indexOf('Gegenspieler:') == 0) {
       return false;
     } else {
       return true;
