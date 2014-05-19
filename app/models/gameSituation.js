@@ -11,8 +11,8 @@
                           - team and opponent
                           - score Position
                           - situation notation
-                        
-*/                  
+
+*/
 //-----------------------------------------------------------------------------
 
 var _ = require('underscore')._;
@@ -30,12 +30,12 @@ var GameSituation = function(spreadsheetNotation) {
   this.playerPositionPartsPattern = new RegExp(/(\w{1}.\s*[A-Z,a-z,ö,ä,ü,é,è,ê]+)\s*([A-Z]\d{1,2})\s*(\(.*\))?/);
   this.positionPattern = new RegExp(/[A-R]\d{1,2}/);
   this.specialConditionsPattern = new RegExp(/\((FD|FI|E|P|PS|EW|F:\s*.*)\)/);
-  
+
   // class variables
   var maxTime = 125; // 120 min + 5 min overtime
   var allowedScorePositions = ["OR", "OM", "OL", "UR", "UM", "UL", "LD", "RD", "OD", "G:"];
 
-  
+
   // ==========================
   // parsing helper methods
   // ==========================
@@ -58,37 +58,37 @@ var GameSituation = function(spreadsheetNotation) {
       this.parseErrors.push("The situation on line " + ( this.line ) + " has an empty expression in (). Use any of FD, FI, E, P, PS, EW, F:<player>.");
     }
   };
-  
+
   // parse the player name position and special condition
   var parsePlayerPositions = function(playerPositions, players) {
     for ( var i = 0; i < playerPositions.length; i++ ) {
       var lastPlayerName,
           lastPlayerPosition,
           walkingMan = false,
-          playerPosition = {}; 
-          
+          playerPosition = {};
+
       // split into name, position and special condition, e.g. penalty or foul
       var playerPositionParts = this.playerPositionPartsPattern.exec(playerPositions[i]);
-      
+
       if ( !playerPositionParts || playerPositionParts.length < 2 ) {
         this.parseErrors.push("The situation on line " + ( this.line ) + " could not be parsed into its parts.");
         continue;
       }
-      
+
       if ( !playerPositionParts[1] ) {
         this.parseErrors.push("The situation on line " + ( this.line ) + " has a part without a player name.");
         continue;
       }
-      
+
       var playerName = playerPositionParts[1].trim();
-      
+
       // NOTE: do the special conditions first so you can use them for the walking man test
       // the special condition: optional
       // => if it is a walking man this step needs to be repeated later in the iteration (see below)
       if ( playerPositionParts[3] ) {
         parseSpecialCondition(playerPositionParts[3], playerPosition);
       }
-      
+
       // if it is a walking man just push to the playerPosition object from the last iteration
       // NOTE: cannot be a walking man when fouled (plain physics)
       if ( lastPlayerName === playerName &&
@@ -98,7 +98,7 @@ var GameSituation = function(spreadsheetNotation) {
         playerPosition = lastPlayerPosition;
         walkingMan = true;
       }
-      
+
       // the name
       if ( playerPositionParts[1] ) {
         playerPosition.name = playerName;
@@ -106,7 +106,7 @@ var GameSituation = function(spreadsheetNotation) {
       } else {
         this.parseErrors.push("The situation on line " + ( this.line ) + " has a part without a player name.");
       }
-      
+
       // the position
       if ( playerPositionParts[2] ) {
         if ( !playerPosition.positions ){
@@ -116,29 +116,29 @@ var GameSituation = function(spreadsheetNotation) {
       } else {
         this.parseErrors.push("The situation on line " + ( this.line ) + " has a part without a player position.");
       }
-      
+
       // NOTE: need to do this again in case of a walking man since playerPosition object changed
       if ( walkingMan === true ) {
         if ( playerPositionParts[3] ) {
           parseSpecialCondition(playerPositionParts[3], playerPosition);
         }
       }
-      
+
       lastPlayerPosition = playerPosition;
       if ( walkingMan === false )
         this.playerPositions.push(playerPosition);
     }
   };
-  
+
   // ==========================
   // validation methods
   // ==========================
   // validates a date
   var validateDate = function() {
     if ( Object.prototype.toString.call(this.date) !== '[object Date]' )
-      this.validationErrors.push("The situation on line " + ( this.line ) + " has an invalid date field. Write as dd.mm.yyyy, e.g. 02.01.2012");  
+      this.validationErrors.push("The situation on line " + ( this.line ) + " has an invalid date field. Write as dd.mm.yyyy, e.g. 02.01.2012");
   };
-  
+
   // validates the minute
   var validateMinute = function() {
     if ( isNaN(this.minute - 0) ) {
@@ -148,7 +148,7 @@ var GameSituation = function(spreadsheetNotation) {
         this.validationErrors.push("The maximum allowed time is " + maxTime + " minutes. The minute on line " + ( this.line ) + " is bigger or smaller than 0.");
     }
   };
-  
+
   // validates the team and opponent fields
   var validateTeamAndOpponent = function() {
     if ( this.opponent.toLowerCase() == 'fcb' ) {
@@ -158,7 +158,7 @@ var GameSituation = function(spreadsheetNotation) {
       this.validationErrors.push("On line " + ( this.line ) + " the team leading the situation has to be the FCB or the opponent.");
     }
   };
-  
+
   // validates the score position field
   var validateScorePosition = function() {
     if ( _.indexOf(allowedScorePositions, this.scorePosition.slice(0,2)) == -1 ) {
@@ -166,16 +166,26 @@ var GameSituation = function(spreadsheetNotation) {
     }
     // TODO: validate Gehalten special case
   };
-  
+
+
+  var shouldValidatePlayerName = function(name) {
+    if (name.substring(0, 2) == 'G:') {
+      return false;
+    } else {
+      return true;
+    }
+  };
+
   var validatePlayerPositions = function(players) {
     if ( this.team.toLowerCase() == "fcb" ) {
       for ( var i = 0; i < this.playerPositions.length; i++ ) {
         // the name
-        //var number = players[this.playerPositions[i].name];
-        if ( !players[this.playerPositions[i].name] ) {
-          this.validationErrors.push("The name " + this.playerPositions[i].name + " on line " + ( this.line ) + " is not a valid player name. Check the correct nicknames.");
-        } 
-        
+        if (shouldValidatePlayerName(this.playerPositions[i].name)) {
+          if ( !players[this.playerPositions[i].name] ) {
+            this.validationErrors.push("The name " + this.playerPositions[i].name + " on line " + ( this.line ) + " is not a valid player name. Check the correct nicknames.");
+          }
+        }
+
         // the position
         for ( var n = 0; n < this.playerPositions[i].positions.length; n++ ) {
           var position = this.playerPositions[i].positions[n];
@@ -183,12 +193,11 @@ var GameSituation = function(spreadsheetNotation) {
             this.validationErrors.push("The position " + position + " on line " + ( this.line ) + " is not well-formed, see the grid for valid values.");
           }
         }
-        // TODO: the special condition
       }
     }
   };
-  
-  
+
+
   // ==========================
   // instance methods
   // ==========================
@@ -200,10 +209,10 @@ var GameSituation = function(spreadsheetNotation) {
     this.team = this.spreadsheetNotation.team;
     this.scorePosition = this.spreadsheetNotation.scorePosition;
     this.minute = this.spreadsheetNotation.minute;
-    
+
     // helper field
     this.line = this.spreadsheetNotation.line + 1;
-    
+
     // boolean flags
     if ( this.spreadsheetNotation.scoredByHead === 'x' )
       this.scoredByHead = true;
@@ -215,24 +224,24 @@ var GameSituation = function(spreadsheetNotation) {
       this.scoredByWhatever = true;
     if ( this.spreadsheetNotation.ownGoal === 'x' )
       this.ownGoal = true;
-      
+
     // situation Notation
     var playerPositions = this.spreadsheetNotation.gameSituation.split("->");
     //console.log(playerPositions);
     parsePlayerPositions.call(this, playerPositions, players);
   };
-  
+
   // validates the parsed fields
   this.validate = function(players) {
-    
+
     validateDate.call(this);
     validateMinute.call(this);
     validateTeamAndOpponent.call(this);
     validateScorePosition.call(this);
-    
+
     validatePlayerPositions.call(this, players);
   };
-  
+
   this.addGameData = function(games) {
     var gameExists = false;
     for (var key in games) {
@@ -246,7 +255,7 @@ var GameSituation = function(spreadsheetNotation) {
     }
     return gameExists;
   };
-  
+
   this.addPlayersData = function(players) {
     _.each( this.playerPositions, function(playerPosition) {
       if ( players[playerPosition.name] ) {
@@ -275,8 +284,8 @@ GameSituation.parseValidateAndSaveSpreadsheet = function(dbHandler, spreadsheetL
       //console.log("loading player: " + player.nickname);
       players[player.nickname] = { "number": player.number, "fullname": player.name };
     });
-    
-    dbHandler.hgetall("Games", function (err, games) {      
+
+    dbHandler.hgetall("Games", function (err, games) {
       var errors = [];
       var gameSituations = [];
       for ( var i = 0; i < spreadsheetList.length; i++ ) {
@@ -297,7 +306,7 @@ GameSituation.parseValidateAndSaveSpreadsheet = function(dbHandler, spreadsheetL
         for ( i = 0; i < errors.length; i++ ) {
           errorString = errorString + "validation error:\n" + errors[i] + "\n";
         }
-      
+
         return callback(errorString, 400);
       } else {
         // redis operations
@@ -308,7 +317,7 @@ GameSituation.parseValidateAndSaveSpreadsheet = function(dbHandler, spreadsheetL
 
         return callback("OK", 200);
       }
-    });  
+    });
   });
 };
 
