@@ -22,7 +22,8 @@ var logIncoming = function(req, res, next) {
 var saisons = {
   'all': [new Date(2011, 06, 01), new Date(2099, 05, 30)], // 1. Jul 2011 - 30. Jun 2099
   '12/13': [new Date(2012, 06, 01), new Date(2013, 05, 30)], // 1. Jul 2012 - 30. Jun 2013
-  '13/14': [new Date(2013, 06, 01), new Date(2014, 05, 30)]  // 1. Jul 2013 - 20. Jun 2014
+  '13/14': [new Date(2013, 06, 01), new Date(2014, 05, 30)],  // 1. Jul 2013 - 20. Jun 2014
+  '14/15': [new Date(2014, 06, 01), new Date(2015, 06, 30)] // 1. Jul 2014 - 20. Jun 2015
 };
 
 var initStatistics = function(player) {
